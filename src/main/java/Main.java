@@ -11,7 +11,7 @@ public class Main {
     String url = "jdbc:mysql://127.0.0.1/mydb";
 
     String uname = "root";
-    String pass = "Vansvirm21#";
+    String pass = "";
 
     //Class.forName("org.cj.mysql.jdbc.Driver");
 
