@@ -1,3 +1,6 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.Date;
 
 public class Filter {
@@ -34,6 +37,15 @@ public class Filter {
     this.has_ac = has_ac;
 
   }
+
+  PreparedStatement ps;
+  Connection connection;
+  Statement sql = connection.createStatement();
+
+  //---------------------------------------------------------------------------------------
+  //Create jdbc_demo table
+  String sqlQ;
+
   public boolean filter_by_address(String city, String country, String apt_name) {
     if (this.city.equalsIgnoreCase(city) && this.country.equalsIgnoreCase(country) &&
             this.apt_name.equalsIgnoreCase(apt_name)) {
@@ -42,6 +54,12 @@ public class Filter {
     return false;
   }
 
-  public
+  public filter_by_price_range(int price_low, int price_high) {
+    sqlQ = "SELECT * from Calender\n" +
+            "\tWHERE price >= price_low AND price <= price_high\n" +
+            "\tORDER BY price\n";
+    System.out.println("Executing this filter_by_price_range: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
+    sql.executeUpdate(sqlQ);
+  }
 
 }
