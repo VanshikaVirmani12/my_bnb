@@ -52,8 +52,8 @@ public class Main {
       sqlQ = "create table Listings(\n" +
               "\tlisting_ID integer primary key,\n" +
               "\troom_type varchar(15) not null,\n" +
-              "\tlatitude integer,\n" +
-              "\tlongitude integer)\n";
+              "\tlatitude integer NOT NULL,\n" +
+              "\tlongitude integer NOT NULL)\n";
 
       System.out.println("Executing this command: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
       sql.executeUpdate(sqlQ);
@@ -83,8 +83,8 @@ public class Main {
       sql.executeUpdate(sqlQ);
 
       sqlQ = "create table Calender(\n" +
-              "\tdate Date primary key,\n" +
-              "\tprice integer,\n" +
+              "\tdate Date primary key NOT NULL,\n" +
+              "\tprice integer NOT NULL,\n" +
               "\tis_available integer)\n";
       System.out.println("Executing this command: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
       sql.executeUpdate(sqlQ);
@@ -111,8 +111,8 @@ public class Main {
       ps.close();
 
       sqlQ = "create table has_availability(\n" +
-              "\tdate Date,\n" +
-              "\tlisting_ID integer,\n" +
+              "\tdate Date NOT NULL,\n" +
+              "\tlisting_ID integer NOT NULL,\n" +
               "\tprimary key(date, listing_ID))\n";
 
               System.out.println("Executing this command: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
