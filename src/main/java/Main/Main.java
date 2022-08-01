@@ -1,5 +1,7 @@
 package Main;
 
+import User.LoginPage;
+
 import java.io.IOException;
 import java.sql.*;
 import java.text.DateFormat;
@@ -17,7 +19,7 @@ public class Main {
 
   public static void welcomeScreenBanner() {
     System.out.println("********************************************************************************************************************************************************");
-    System.out.println("\t\t\t\t\t\tWelcome to Salary Manager");
+    System.out.println("\t\t\t\t\t\tWelcome to MyBnb");
     System.out.println("********************************************************************************************************************************************************");
     System.out.println("");
   }
@@ -346,7 +348,8 @@ public class Main {
 //
 //      sqlQ = "create table User(\n" +
 //              "\tSIN integer,\n" +
-//              "\tname varchar(30),\n" +
+//              "\tfirstname varchar(30),\n" +
+//              "\tlastname varchar(30),\n" +
 //              "\toccupation varchar(30),\n" +
 //              "\tdob Date,\n" +
 //              "\tusername varchar(30),\n" +
@@ -356,11 +359,12 @@ public class Main {
 //      System.out.println("Executing this command: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
 //      sql.executeUpdate(sqlQ);
 //
-//      sqlQ = "INSERT INTO User VALUES (?,?,?,?,?,?) ";
+//      sqlQ = "INSERT INTO User VALUES (?,?,?,?,?,?,?) ";
 //      System.out.println("Prepared Statement: " + sqlQ.replaceAll("\\s+", " ") + "\n");
 //      ps = connection.prepareStatement(sqlQ);
 //
-//      String[] names = {"Vanshika", "Annanya", "Bob", "Chandler", "David"};
+//      String[] firstnames = {"Vanshika", "Annanya", "Bob", "Chandler", "David"};
+//      String[] lastnames = {"Virmani", "Sharma", "Kennedy", "Tesla", "Williams"};
 //      String[] usernames = {"Vanshika101", "Annanya101", "Bob101", "Chandler101", "David101"};
 //      String[] passwords = {"1234", "1234", "1234", "1234", "1234"};
 //      String[] occupations = {"Journalist", "Dancer", "Singer", "Artist", "Scientist"};
@@ -369,13 +373,14 @@ public class Main {
 //      for (int i=0; i<5; i++){
 //        System.out.println(i + "...\n");
 //        ps.setInt(1, (i*2));
-//        ps.setString(2, names[i]);
-//        ps.setString(3, occupations[i]);
+//        ps.setString(2, firstnames[i]);
+//        ps.setString(3, lastnames[i]);
+//        ps.setString(4, occupations[i]);
 //        Date myDate = formatter.parse(dobs[i]);
 //        java.sql.Date sqlDate = new java.sql.Date(myDate.getTime());
-//        ps.setDate(4, sqlDate);
-//        ps.setString(5, usernames[i]);
-//        ps.setString(6, passwords[i]);
+//        ps.setDate(5, sqlDate);
+//        ps.setString(6, usernames[i]);
+//        ps.setString(7, passwords[i]);
 //        ps.executeUpdate();
 //      }
 //      ps.close();

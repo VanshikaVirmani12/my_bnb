@@ -22,6 +22,10 @@ public class LoginPage {
     System.out.println();
   }
 
+  public static int getValidatedUserId() {
+    return userId;
+  }
+
   public static void getUserCredentials() throws SQLException {
     logInScreenBanner();
     System.out.print("Input UserName: " );
@@ -69,7 +73,7 @@ public class LoginPage {
       Main.getInput();
     }else {
       setValidatedUserId(userId);
-      UserBlock.UserLogDirectory.userLogIn();
+      User.UserLogDirectory.userLogIn();
       System.out.println("Login successfull....");
       //Thread.sleep(500);
 
