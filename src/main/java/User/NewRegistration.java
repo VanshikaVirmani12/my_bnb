@@ -1,4 +1,4 @@
-package User;
+package user;
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -7,8 +7,11 @@ import java.sql.Statement;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Scanner;
+import ConnectionEstablish.ConnectToJDBC;
 
-import Main.Main;
+import main.Main;
+import main.Main;
+
 public class NewRegistration {
 
   private static Scanner scan = new Scanner(System.in);
@@ -63,7 +66,7 @@ public class NewRegistration {
   }
 
   public static void redirectRegisterOptions() {
-    int userId = User.LoginPage.getValidatedUserId();
+    int userId = user.LoginPage.getValidatedUserId();
     Connection connection = ConnectionEstablish.ConnectToJDBC.getMySqlConnection();
     try {
       Statement stmt1 = connection.createStatement();

@@ -1,16 +1,17 @@
-package Main;
+package main;
 
-import User.LoginPage;
+        import user.LoginPage;
+        import user.NewRegistration;
 
-import java.io.IOException;
-import java.sql.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+        import java.io.IOException;
+        import java.sql.*;
+        import java.text.DateFormat;
+        import java.text.SimpleDateFormat;
+        import java.time.LocalDate;
+        import java.util.*;
+        import java.util.Arrays;
+        import java.util.Date;
+        import java.util.List;
 
 
 public class Main {
@@ -26,6 +27,13 @@ public class Main {
 
   public static void mainScreenBanner() {
     System.out.println("\t\t\t\t\t\tHome Page\n");
+  }
+
+  public static void selectFilter() {
+    clearScreen();
+    welcomeScreenBanner();
+    System.out.println("\t\t\t\t\t\t  View or Transaction\n");
+    System.out.println("1. View Filter Information");
   }
 
   public static void clearScreen() {
@@ -84,7 +92,7 @@ public class Main {
     }else if(selectedOption == 2) {
       clearScreen();
       welcomeScreenBanner();
-      User.NewRegistration.createNewUserAccount();
+      user.NewRegistration.createNewUserAccount();
     }else if(selectedOption == 3){
       System.out.println("Exiting the application...");
       try {

@@ -1,5 +1,8 @@
-package User;
-import Main.*;
+package user;
+import main.*;
+import ConnectionEstablish.ConnectToJDBC;
+import main.Main;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -73,7 +76,7 @@ public class LoginPage {
       Main.getInput();
     }else {
       setValidatedUserId(userId);
-      User.UserLogDirectory.userLogIn();
+     // User.UserLogDirectory.userLogIn();
       System.out.println("Login successfull....");
       //Thread.sleep(500);
 
@@ -83,7 +86,7 @@ public class LoginPage {
       System.out.println("Initiating DB environment values...");
       //ConnectionEstablish.MySqlEnvSetup.mySqlEnvInitialize();
       Thread.sleep(1000);
-      Main.selectViewOrTransactionMenu();
+      Main.selectFilter();
     }
   }
 
