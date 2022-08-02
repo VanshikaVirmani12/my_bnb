@@ -1,6 +1,7 @@
 package Main;
 
 import User.LoginPage;
+import User.NewRegistration;
 
 import java.io.IOException;
 import java.sql.*;
@@ -26,6 +27,16 @@ public class Main {
 
   public static void mainScreenBanner() {
     System.out.println("\t\t\t\t\t\tHome Page\n");
+  }
+
+  public static void selectFilter() {
+    clearScreen();
+    welcomeScreenBanner();
+    System.out.println("\t\t\t\t\t\t  View Filters \n");
+
+    int selectedOption = 0;
+
+    System.out.println("1. Filer by Address");
   }
 
   public static void clearScreen() {
@@ -109,6 +120,7 @@ public class Main {
 
   public static void main (String[] args) throws Exception {
 
+    InitialiseTables.Initialise_all_tables();
     welcomeScreenBanner();
     getInput();
 //

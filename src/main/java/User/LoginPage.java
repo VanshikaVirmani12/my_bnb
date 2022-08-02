@@ -6,24 +6,21 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
 
+import ConnectionEstablish.ConnectToJDBC;
+
 public class LoginPage {
 
-  private static Connection connection= ConnectionEstablish.ConnectToJDBC.getMySqlConnection();;
+  private static Connection connection= ConnectionEstablish.ConnectToJDBC.getMySqlConnection();
   private static Statement st;
   private static ResultSet rs;
   static Scanner scan = new Scanner(System.in);
   private static String username = null;
   private static String password = null;
-  private static int userId;
   public static boolean isValidUser;
 
   public static void logInScreenBanner() {
     System.out.println("\t\t\t\t\t\t  LogIn Page");
     System.out.println();
-  }
-
-  public static int getValidatedUserId() {
-    return userId;
   }
 
   public static void getUserCredentials() throws SQLException {
@@ -39,9 +36,6 @@ public class LoginPage {
     }
   }
 
-  protected static void setValidatedUserId(int userIdArg) {
-    userId = userIdArg;
-  }
 
   public static void validateUser() throws SQLException, InterruptedException {
     st = connection.createStatement();
@@ -54,7 +48,6 @@ public class LoginPage {
     while(rs.next()) {
       if( username.equals(rs.getString("username"))
               && password.equals(rs.getString("password")) ){
-        userId = rs.getInt("userId");
         isValidUser = true;
         break;
       }else {
@@ -63,8 +56,6 @@ public class LoginPage {
     }
 
     if(!isValidUser) {
-      userId=0;
-      setValidatedUserId(userId);
       System.out.println("Invalid Username or Password!!!\nTry Again!!!");
       System.out.println("Redirecting to LogIn Page menu....");
       Thread.sleep(2000);
@@ -72,8 +63,7 @@ public class LoginPage {
       Main.welcomeScreenBanner();
       Main.getInput();
     }else {
-      setValidatedUserId(userId);
-      User.UserLogDirectory.userLogIn();
+      //User.UserLogDirectory.userLogIn();
       System.out.println("Login successfull....");
       //Thread.sleep(500);
 
@@ -83,7 +73,7 @@ public class LoginPage {
       System.out.println("Initiating DB environment values...");
       //ConnectionEstablish.MySqlEnvSetup.mySqlEnvInitialize();
       Thread.sleep(1000);
-      Main.selectViewOrTransactionMenu();
+      Main.selectFilter();
     }
   }
 

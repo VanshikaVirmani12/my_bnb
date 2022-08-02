@@ -16,7 +16,7 @@ public class NewRegistration {
   private static String firstName = null, lastName = null;
   private static String zipcode = null;
   private static Integer SIN = null;
-  private static Date dob = null;
+  private static String dob = null;
   private static String occupation = null;
   private static String apt_name = null, city = null, country = null;
   private static HashMap<Integer, String> mapUserInfo = new HashMap<>();
@@ -46,24 +46,30 @@ public class NewRegistration {
     scan.nextLine();
     mapUserInfo.put(5, String.valueOf(SIN));
 
+    System.out.print("Occupation: ");
+    occupation = scan.nextLine();
+    mapUserInfo.put(6, occupation);
+    System.out.print("Date of Birth (YYYY-MM-DD): ");
+    dob = scan.nextLine();
+    mapUserInfo.put(7, dob);
+
     System.out.print("Apartment Number/Street: ");
     apt_name = scan.nextLine();
-    mapUserInfo.put(6, apt_name);
+    mapUserInfo.put(8, apt_name);
     System.out.print("City: ");
     city = scan.nextLine();
-    mapUserInfo.put(7, city);
+    mapUserInfo.put(9, city);
     System.out.print("Country: ");
     country = scan.nextLine();
-    mapUserInfo.put(8, country);
+    mapUserInfo.put(10, country);
     System.out.print("Zipcode: ");
     zipcode = scan.nextLine(); scan.nextLine();
-    mapUserInfo.put(9, String.valueOf(zipcode));
+    mapUserInfo.put(11, String.valueOf(zipcode));
     System.out.print(mapUserInfo);
     redirectRegisterOptions();
   }
 
   public static void redirectRegisterOptions() {
-    int userId = User.LoginPage.getValidatedUserId();
     Connection connection = ConnectionEstablish.ConnectToJDBC.getMySqlConnection();
     try {
       Statement stmt1 = connection.createStatement();

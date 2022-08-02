@@ -6,10 +6,10 @@ public class ConnectToJDBC {
 
   public static Connection getMySqlConnection() {
     Connection connection = null;
-
+    System.out.println("Hello");
     String url = "jdbc:mysql://127.0.0.1/mydb";
     String uname = "root";
-    String pass = "";
+    String pass = "geetvirm";
 
     try {
       connection =  DriverManager.getConnection(url, uname, pass);
