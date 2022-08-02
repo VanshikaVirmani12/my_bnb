@@ -29,16 +29,6 @@ public class Main {
     System.out.println("\t\t\t\t\t\tHome Page\n");
   }
 
-  public static void selectFilter() {
-    clearScreen();
-    welcomeScreenBanner();
-    System.out.println("\t\t\t\t\t\t  View Filters \n");
-
-    int selectedOption = 0;
-
-    System.out.println("1. Filer by Address");
-  }
-
   public static void clearScreen() {
     try {
       if (System.getProperty("os.name").contains("Windows"))
@@ -55,10 +45,50 @@ public class Main {
 
   public static void getInput() {
     int selectedOption = 0;
-
     clearScreen();
     welcomeScreenBanner();
     mainScreenBanner();
+
+    Boolean Renter = false;
+    System.out.println("Are you a:");
+    System.out.println("1. Renter");
+    System.out.println("2. Host:");
+
+    try {
+      System.out.print("\nInput: ");
+      selectedOption = scan.nextInt();
+      scan.nextLine();
+    } catch(InputMismatchException ime) {
+      System.out.println("Input only numbers... Try again!!!");
+      System.out.println("Redirecting to LogIn page menu...");
+      scan.nextLine();
+      try {
+        Thread.sleep(1000);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+      clearScreen();
+      welcomeScreenBanner();
+      getInput();
+    }
+
+    if(selectedOption == 1) {
+        clearScreen();
+        Renter = true;
+      }
+    else if(selectedOption == 2) {
+      Renter = false;
+      clearScreen();
+    } else {
+      System.out.println("Invalid input... Try again!!!");
+      System.out.println("Redirecting to LogIn page menu....");
+      try{Thread.sleep(1000);
+      } catch (InterruptedException e) { e.printStackTrace();}
+
+      clearScreen();
+      welcomeScreenBanner();
+      getInput();
+    }
 
     System.out.println("Enter your choice properly");
     System.out.println("1. Login");
@@ -76,7 +106,6 @@ public class Main {
       try {
         Thread.sleep(1000);
       } catch (InterruptedException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
       }
       clearScreen();
@@ -88,20 +117,19 @@ public class Main {
       try {
         clearScreen();
         welcomeScreenBanner();
-        LoginPage.getUserCredentials();
+        LoginPage.getUserCredentials(Renter);
       } catch (SQLException e) {
         e.printStackTrace();
       }
     }else if(selectedOption == 2) {
       clearScreen();
       welcomeScreenBanner();
-      User.NewRegistration.createNewUserAccount();
+      User.NewRegistration.createNewUserAccount(Renter);
     }else if(selectedOption == 3){
       System.out.println("Exiting the application...");
       try {
         Thread.sleep(500);
       } catch (InterruptedException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
       }
       clearScreen();

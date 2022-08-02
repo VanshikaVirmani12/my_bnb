@@ -23,21 +23,21 @@ public class LoginPage {
     System.out.println();
   }
 
-  public static void getUserCredentials() throws SQLException {
+  public static void getUserCredentials(Boolean renter) throws SQLException {
     logInScreenBanner();
     System.out.print("Input UserName: " );
     username = scan.nextLine();
     System.out.print("Input Password: ");
     password = scan.nextLine();
     try {
-      validateUser();
+      validateUser(renter);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
   }
 
 
-  public static void validateUser() throws SQLException, InterruptedException {
+  public static void validateUser(Boolean renter) throws SQLException, InterruptedException {
     st = connection.createStatement();
 
     String getAllUserQuery = "SELECT * FROM User";
@@ -65,18 +65,21 @@ public class LoginPage {
     }else {
       //User.UserLogDirectory.userLogIn();
       System.out.println("Login successfull....");
-      //Thread.sleep(500);
-
-      System.out.println("Redirecting to view/transaction menu....");
       Thread.sleep(500);
 
-      System.out.println("Initiating DB environment values...");
-      //ConnectionEstablish.MySqlEnvSetup.mySqlEnvInitialize();
-      Thread.sleep(1000);
-      Main.selectFilter();
+      if (renter) {
+        System.out.println("Logging in as Renter");
+        Thread.sleep(500);
+        Renter.selectFilter();
+      }
+      else {
+        System.out.println("Logging in as Host");
+        Thread.sleep(500);
+        Host.startPage();
+      }
+
     }
   }
 
 
 }
-

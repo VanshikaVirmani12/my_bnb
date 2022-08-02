@@ -65,7 +65,6 @@ public class InitialiseTables {
               "\tprimary key(date, listing_ID),\n" +
               "\tFOREIGN KEY (listing_ID) REFERENCES Listings(listing_ID))\n";
 
-
       System.out.println("Executing this command: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
       sql.executeUpdate(sqlQ);
 
@@ -263,12 +262,14 @@ public class InitialiseTables {
 
       sqlQ = "create table Renter(\n" +
               "\tSIN integer,\n" +
-              "\tpayment integer,\n" +
+              "\tpayment varchar(10),\n" +
               "\tprimary key(SIN),\n" +
               "\tFOREIGN KEY (SIN) REFERENCES User(SIN))\n";
 
       System.out.println("Executing this command: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
       sql.executeUpdate(sqlQ);
+
+      String[] payment_info = {"1293-9287", "8273-8734"};
 
       sqlQ = "INSERT INTO Renter VALUES (?,?\n) ";
       System.out.println("Prepared Statement: " + sqlQ.replaceAll("\\s+", " ") + "\n");
@@ -277,7 +278,7 @@ public class InitialiseTables {
       for (int i=0; i<2; i++){
         System.out.println(i + "...\n");
         ps.setInt(1, (i*2));
-        ps.setInt(2, (i*5)+12);
+        ps.setString(2, payment_info[i]);
         ps.executeUpdate();
       }
       ps.close();
