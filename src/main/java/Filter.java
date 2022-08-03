@@ -5,6 +5,9 @@ import java.sql.Statement;
 import java.util.Date;
 import java.sql.ResultSet;
 
+import java.util.*;
+import java.lang.*;
+
 public class Filter {
 
   String city;
@@ -44,6 +47,8 @@ public class Filter {
 
   }
 
+
+
   PreparedStatement ps;
   Connection connection;
   Statement sql = connection.createStatement();
@@ -68,42 +73,57 @@ public class Filter {
     ResultSet rs = sql.executeQuery(sqlQ);
 
     while (rs.next()){
-      System.out.print("City:"+rs.getString("City") +", ");
-      // Print the data
+      System.out.print("Listing Id: "+rs.getString("listing_ID") +", ");
+      System.out.println("Price: "+rs.getString("price"));
     }
 
   }
 
-  public void filter_by_long_lat(int log, int lat, int distance) throws SQLException{
-    // if distance not defined, define a default
+  public void filter_by_long_lat(int lon_i, int lat_i, int distance) throws SQLException{
+    // define a default distance
     // order by distance
-    sqlQ = "";
+    sqlQ = "SELECT * from Listings\n";
     System.out.println("Executing this filter_by_long_lat: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
     ResultSet rs = sql.executeQuery(sqlQ);
 
     while (rs.next()){
-      // Print the data
+      double lon = rs.getDouble("longitude");
+      double lat = rs.getDouble("latitude");
+      if (get_distance_lon_lat(lon_i, lat_i, lon, lat) <= distance){
+        System.out.print("Listing Id: "+rs.getString("listing_ID") +", ");
+        System.out.print("Longitude: "+lon+", ");
+        System.out.println("Latitude: "+lat);
+      }
     }
   }
 
-  public void filter_by_postal_code(String postal_code) throws SQLException{
+  public void filter_by_postal_code(String postal_code_i, int distance) throws SQLException{
     // same or adjacent postal codes
-    sqlQ = "";
+    sqlQ = "SELECT * from has_address\n";
     System.out.println("Executing this filter_by_postal_code: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
     ResultSet rs = sql.executeQuery(sqlQ);
 
     while (rs.next()){
-      // Print the data
+      String postal_code = rs.getString("postal_code");
+      if (get_distance_postal_code(postal_code, postal_code_i) <= distance){
+        System.out.print("Listing Id: "+rs.getString("listing_ID") +", ");
+        System.out.println("Postal Code: "+postal_code);
+      }
     }
   }
 
-  public void filter_by_address(String apt_name, String city, String country, String postal_code) throws SQLException {
-    sqlQ = "";
+  public void filter_by_address(String apt_name_i, String city_i, String country_i, String postal_code_i) throws SQLException {
+    sqlQ = "SELECT * from has_address\n" +
+            "\tWHERE apt_name LIKE apt_name_i AND city LIKE city_i AND country LIKE country_i AND postal_code LIKE postal_code_i\n";
     System.out.println("Executing this filter_by_address: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
     ResultSet rs = sql.executeQuery(sqlQ);
 
     while (rs.next()){
-      // Print the data
+      System.out.print("Listing Id: "+rs.getString("listing_ID") +", ");
+      System.out.print("Apt Name: "+rs.getString("apt_name") +", ");
+      System.out.print("City: "+rs.getString("city") +", ");
+      System.out.print("Country: "+rs.getString("country") +", ");
+      System.out.print("Postal Code: "+rs.getString("postal_code"));
     }
   }
 
@@ -127,6 +147,27 @@ public class Filter {
     }
   }
 
+
+  // Helper functions
+
+  public double get_distance_lon_lat(double lon1, double lat1, double lon2, double lat2){
+
+    double dlon = Math.toRadians(lon2) - Math.toRadians(lon1);
+    double dlat = Math.toRadians(lat2) - Math.toRadians(lat1);
+    double a = Math.pow(Math.sin(dlat / 2), 2)
+            + Math.cos(lat1) * Math.cos(lat2)
+            * Math.pow(Math.sin(dlon / 2),2);
+    double c = 2 * Math.asin(Math.sqrt(a));
+    double r = 6371;
+    return c*r;
+
+  }
+
+  public int get_distance_postal_code(String postal_code1, String postal_code2){
+    int num1 = postal_code1.hashCode();
+    int num2 = postal_code2.hashCode();
+    return num2 - num1;
+  }
 
 
 }
