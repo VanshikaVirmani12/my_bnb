@@ -20,7 +20,6 @@ public class InitialiseTables {
       sqlQ = "SET FOREIGN_KEY_CHECKS = 0\n";
       sql.executeUpdate(sqlQ);
       sqlQ = "DROP TABLE IF EXISTS Listings, Student, Course, Offering,Took, Calender, has_availability, Address, has_address, Amenities, has_amenities, User, owns, rents, Review, Renter, Host\n";
-      System.out.println("Executing this command: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
       sql.executeUpdate(sqlQ);
       PreparedStatement ps;
 
@@ -28,32 +27,27 @@ public class InitialiseTables {
       sql.executeUpdate(sqlQ);
 
       sqlQ = "create table Listings(\n" +
-              "\tlisting_ID integer primary key,\n" +
+              "\tlisting_ID INT AUTO_INCREMENT,\n" +
               "\troom_type varchar(15) not null,\n" +
               "\tlatitude integer NOT NULL,\n" +
-              "\tlongitude integer NOT NULL)\n";
+              "\tlongitude integer NOT NULL,\n" +
+              "\tpostal_code varchar(8),\n" +
+              "\tcity varchar(15),\n" +
+              "\tcountry varchar(15),\n" +
+              "\tapt_name varchar(30),\n" +
+              "\tprimary key(listing_ID))\n";
 
-      System.out.println("Executing this command: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
       sql.executeUpdate(sqlQ);
 
       String[] room_types = {"room", "full house", "apartment", "full house", "apartment"};
       Integer[] latitudes = {1043, 1202, 3402, 4392, 1039};
       Integer[] longitudes = {2832, 3923, 1848, 8274, 1293};
 
-      sqlQ = "INSERT INTO Listings VALUES (?,?,?,?)\n";
-      System.out.println("Prepared Statement: " + sqlQ.replaceAll("\\s+", " ") + "\n");
-      ps = connection.prepareStatement(sqlQ);
-      for (int i=0; i<5; i++){
-        System.out.println(i + "...\n");
+      sqlQ = "INSERT INTO Listings (room_type, latitude, longitude, postal_code, city, country, apt_name) VALUES ('room', 1043, 1829, 'M', 'S', 'S', 'S'),\n" +
+              "('full house', 1203, 2383, 'E', 'G', 'G', 'G'), ('apartment', 1292, 1932, 'H', 'R', 'R', 'R')\n";
 
-        //Set column one (ID) to i
-        ps.setInt(1,i);
-        ps.setString(2,room_types[i]);
-        ps.setInt(3,latitudes[i]);
-        ps.setInt(4,longitudes[i]);
-        ps.executeUpdate();
-      }
-      ps.close();
+      sql.executeUpdate(sqlQ);
+
 
       //Create jdbc_demo table
 
@@ -65,7 +59,6 @@ public class InitialiseTables {
               "\tprimary key(date, listing_ID),\n" +
               "\tFOREIGN KEY (listing_ID) REFERENCES Listings(listing_ID))\n";
 
-      System.out.println("Executing this command: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
       sql.executeUpdate(sqlQ);
 
       Integer[] prices = {50, 50, 50, 70, 70};
@@ -76,10 +69,8 @@ public class InitialiseTables {
       Integer[] listings = {1, 1, 1, 2, 2};
 
       sqlQ = "INSERT INTO Calender VALUES (?,?,?)\n";
-      System.out.println("Prepared Statement: " + sqlQ.replaceAll("\\s+", " ") + "\n");
       ps = connection.prepareStatement(sqlQ);
       for (int i=0; i<5; i++){
-        System.out.println(i + "...\n");
 
         Date myDate = formatter.parse(dates[i]);
         java.sql.Date sqlDate = new java.sql.Date(myDate.getTime());
@@ -124,7 +115,6 @@ public class InitialiseTables {
               "\tapt_name varchar(30),\n" +
               "\tprimary key(postal_code, city, country, apt_name))\n";
 
-      System.out.println("Executing this command: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
       sql.executeUpdate(sqlQ);
 
       String[] postal_codes = {"M1G3T8", "M1G3T8", "M1G3T8", "M1G3T8"};
@@ -133,10 +123,8 @@ public class InitialiseTables {
       String [] apt = {"Highland", "Highland", "Highland", "Highland"};
 
       sqlQ = "INSERT INTO Address VALUES (?,?,?,?)";
-      System.out.println("Prepared Statement: " + sqlQ.replaceAll("\\s+", " ") + "\n");
       ps = connection.prepareStatement(sqlQ);
       for (int i=0; i<4; i++){
-        System.out.println(i + "...\n");
 
         ps.setString(1, postal_codes[i]);
         ps.setString(2,city[i]);
@@ -146,9 +134,10 @@ public class InitialiseTables {
       }
       ps.close();
 
+
       //has_addr(listing_id, postal_code, city, country, number_name)
       sqlQ = "create table has_address(\n" +
-              "\tlisting_ID integer,\n" +
+              "\tlisting_ID integer NOT NULL AUTO_INCREMENT,\n" +
               "\tpostal_code varchar(8),\n" +
               "\tcity varchar(15),\n" +
               "\tcountry varchar(15),\n" +
@@ -156,16 +145,12 @@ public class InitialiseTables {
               "\tprimary key(listing_ID, postal_code, city, country, apt_name),\n" +
               "\tFOREIGN KEY (listing_ID) REFERENCES Listings(listing_ID))\n";
 
-
-      System.out.println("Executing this command: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
       sql.executeUpdate(sqlQ);
 
       sqlQ = "INSERT INTO has_address VALUES (?,?,?,?,?\n)";
-      System.out.println("Prepared Statement: " + sqlQ.replaceAll("\\s+", " ") + "\n");
       ps = connection.prepareStatement(sqlQ);
 
       for (int i=0; i<4; i++){
-        System.out.println(i + "...\n");
         ps.setInt(1, i);
         ps.setString(2, postal_codes[i]);
         ps.setString(3,city[i]);
@@ -182,16 +167,13 @@ public class InitialiseTables {
               "\tprimary key(amenity_ID, listing_ID),\n" +
               "\tFOREIGN KEY (listing_ID) REFERENCES Listings(listing_ID))\n";
 
-      System.out.println("Executing this command: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
       sql.executeUpdate(sqlQ);
 
       sqlQ = "INSERT INTO Amenities VALUES (?,?,?)\n";
-      System.out.println("Prepared Statement: " + sqlQ.replaceAll("\\s+", " ") + "\n");
       ps = connection.prepareStatement(sqlQ);
 
       String[] amenities = {"Wifi", "Kitchen", "Washer", "Dryer", "Air-conditioning"};
       for (int i=0; i<5; i++){
-        System.out.println(i + "...\n");
         ps.setInt(1, i);
         ps.setString(2, amenities[i]);
         ps.setInt(3, listings[i]);
@@ -230,12 +212,9 @@ public class InitialiseTables {
               "\tpassword varchar(30),\n" +
               "\tprimary key(SIN))\n";
 
-      System.out.println("USER TABLE");
-      System.out.println("Executing this command: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
       sql.executeUpdate(sqlQ);
 
       sqlQ = "INSERT INTO User VALUES (?,?,?,?,?,?,?)\n";
-      System.out.println("Prepared Statement: " + sqlQ.replaceAll("\\s+", " ") + "\n");
       ps = connection.prepareStatement(sqlQ);
 
       String[] firstnames = {"Vanshika", "Annanya", "Bob", "Chandler", "David"};
@@ -246,7 +225,6 @@ public class InitialiseTables {
       String[] dobs = {"2002-02-06", "2002-02-06", "2002-02-06", "2002-02-06", "2002-02-06"};
 
       for (int i=0; i<5; i++){
-        System.out.println(i + "...\n");
         ps.setInt(1, (i*2));
         ps.setString(2, firstnames[i]);
         ps.setString(3, lastnames[i]);
@@ -266,17 +244,14 @@ public class InitialiseTables {
               "\tprimary key(SIN),\n" +
               "\tFOREIGN KEY (SIN) REFERENCES User(SIN))\n";
 
-      System.out.println("Executing this command: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
       sql.executeUpdate(sqlQ);
 
       String[] payment_info = {"1293-9287", "8273-8734"};
 
       sqlQ = "INSERT INTO Renter VALUES (?,?\n) ";
-      System.out.println("Prepared Statement: " + sqlQ.replaceAll("\\s+", " ") + "\n");
       ps = connection.prepareStatement(sqlQ);
 
       for (int i=0; i<2; i++){
-        System.out.println(i + "...\n");
         ps.setInt(1, (i*2));
         ps.setString(2, payment_info[i]);
         ps.executeUpdate();
@@ -288,15 +263,12 @@ public class InitialiseTables {
               "\tprimary key(SIN),\n" +
               "\tFOREIGN KEY (SIN) REFERENCES User(SIN))\n";
 
-      System.out.println("Executing this command: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
       sql.executeUpdate(sqlQ);
 
       sqlQ = "INSERT INTO Host VALUES (?\n) ";
-      System.out.println("Prepared Statement: " + sqlQ.replaceAll("\\s+", " ") + "\n");
       ps = connection.prepareStatement(sqlQ);
 
       for (int i=0; i<2; i++){
-        System.out.println(i + "...\n");
         ps.setInt(1, (i*2));
         ps.executeUpdate();
       }
@@ -304,26 +276,25 @@ public class InitialiseTables {
 
       sqlQ = "create table owns(\n" +
               "\tSIN integer,\n" +
-              "\tlisting_ID integer,\n" +
-              "\tprimary key(SIN, listing_ID),\n" +
-              "\tFOREIGN KEY (SIN) REFERENCES User(SIN),\n" +
-              "\tFOREIGN KEY (listing_ID) REFERENCES Listings(listing_ID))\n";
+              "\tlisting_ID integer NOT NULL AUTO_INCREMENT,\n" +
+              "\tprimary key(listing_ID, SIN),\n" +
+              "\tFOREIGN KEY (SIN) REFERENCES User(SIN))\n";
+             // "\tFOREIGN KEY (listing_ID) REFERENCES Listings(listing_ID))\n";
 
 
-      System.out.println("Executing this command: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
       sql.executeUpdate(sqlQ);
 
-      sqlQ = "INSERT INTO owns VALUES (?,?\n) ";
-      System.out.println("Prepared Statement: " + sqlQ.replaceAll("\\s+", " ") + "\n");
-      ps = connection.prepareStatement(sqlQ);
-
-      for (int i=0; i<2; i++){
-        System.out.println(i + "...\n");
-        ps.setInt(1, (i*2));
-        ps.setInt(2, i);
-        ps.executeUpdate();
-      }
-      ps.close();
+//      sqlQ = "INSERT INTO owns VALUES (\n) ";
+//      System.out.println("Prepared Statement: " + sqlQ.replaceAll("\\s+", " ") + "\n");
+//      ps = connection.prepareStatement(sqlQ);
+//
+//      for (int i=0; i<2; i++){
+//        System.out.println(i + "...\n");
+//        ps.setInt(1, (i*2));
+//        ps.setInt(2, i);
+//        ps.executeUpdate();
+//      }
+//      ps.close();
 
       sqlQ = "create table rents(\n" +
               "\tSIN integer,\n" +
@@ -331,10 +302,9 @@ public class InitialiseTables {
               "\tstart_date Date,\n" +
               "\tend_date Date,\n" +
               "\tprimary key(SIN, listing_ID),\n" +
-              "\tFOREIGN KEY (SIN) REFERENCES User(SIN),\n" +
-              "\tFOREIGN KEY (listing_ID) REFERENCES Listings(listing_ID))\n";
+              "\tFOREIGN KEY (SIN) REFERENCES User(SIN))\n";
+              //"\tFOREIGN KEY (listing_ID) REFERENCES Listings(listing_ID))\n";
 
-      System.out.println("Executing this command: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
       sql.executeUpdate(sqlQ);
 
       Integer[] rents_from = {0, 1, 0, 1, 1};
@@ -342,11 +312,9 @@ public class InitialiseTables {
       String[] end_dates = {"2022-01-02", "2022-01-04", "2022-01-05", "2022-01-05", "2022-01-09"};
 
       sqlQ = "INSERT INTO rents VALUES (?,?,?,?\n) ";
-      System.out.println("Prepared Statement: " + sqlQ.replaceAll("\\s+", " ") + "\n");
       ps = connection.prepareStatement(sqlQ);
 
       for (int i=2; i<5; i++){
-        System.out.println(i + "...\n");
         ps.setInt(1, (i*2));
         ps.setInt(2, rents_from[i]);
         Date my_start_date = formatter.parse(start_dates[i]);
@@ -367,12 +335,11 @@ public class InitialiseTables {
               "\trenter_ID integer,\n" +
               "\tcomment varchar(200),\n" +
               "\trating integer,\n" +
-              "\tprimary key(review_ID),\n" +
-              "\tFOREIGN KEY (host_ID) REFERENCES Host(SIN),\n" +
-              "\tFOREIGN KEY (renter_ID) REFERENCES Renter(SIN),\n" +
-              "\tFOREIGN KEY (listing_ID) REFERENCES Listings(listing_ID))\n";
+              "\tprimary key(review_ID))\n";
+             // "\tFOREIGN KEY (host_ID) REFERENCES Host(SIN),\n" +
+             // "\tFOREIGN KEY (renter_ID) REFERENCES Renter(SIN))\n";
+             // "\tFOREIGN KEY (listing_ID) REFERENCES Listings(listing_ID))\n";
 
-      System.out.println("Executing this command: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
       sql.executeUpdate(sqlQ);
 
       String[] reviews = {"Amazing view", "Best pool", "Poor service"};
@@ -381,11 +348,9 @@ public class InitialiseTables {
       Integer[] hosts = {0, 1, 1};
 
       sqlQ = "INSERT INTO Review VALUES (?,?,?,?,?,?\n) ";
-      System.out.println("Prepared Statement: " + sqlQ.replaceAll("\\s+", " ") + "\n");
       ps = connection.prepareStatement(sqlQ);
 
       for (int i=0; i<3; i++){
-        System.out.println(i + "...\n");
         ps.setInt(1, i);
         ps.setInt(2, i);
         ps.setInt(3, hosts[i]);

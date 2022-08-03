@@ -110,6 +110,7 @@ public class NewRegistration {
       System.out.println(insertIntoAddress);
       stmt1.executeUpdate(insertIntoAddress);
 
+
       System.out.println("Gathering the information...");
       Thread.sleep(200);
       System.out.println("Registering the user...");

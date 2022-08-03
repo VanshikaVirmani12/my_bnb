@@ -17,6 +17,7 @@ public class LoginPage {
   private static String username = null;
   private static String password = null;
   public static boolean isValidUser;
+  public static int userSIN = 0;
 
   public static void logInScreenBanner() {
     System.out.println("\t\t\t\t\t\t  LogIn Page");
@@ -37,6 +38,10 @@ public class LoginPage {
   }
 
 
+  public static int getSIN(){
+    return userSIN;
+  }
+
   public static void validateUser(Boolean renter) throws SQLException, InterruptedException {
     st = connection.createStatement();
 
@@ -48,7 +53,9 @@ public class LoginPage {
     while(rs.next()) {
       if( username.equals(rs.getString("username"))
               && password.equals(rs.getString("password")) ){
+        System.out.println(username);
         isValidUser = true;
+        userSIN = rs.getInt("SIN");
         break;
       }else {
         isValidUser = false;
@@ -64,7 +71,7 @@ public class LoginPage {
       Main.getInput();
     }else {
       //User.UserLogDirectory.userLogIn();
-      System.out.println("Login successfull....");
+      System.out.println("Login successful....");
       Thread.sleep(500);
 
       if (renter) {
