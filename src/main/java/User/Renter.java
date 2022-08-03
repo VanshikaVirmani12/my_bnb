@@ -14,6 +14,10 @@ public class Renter {
     System.out.println("1. Filer by Address");
   }
 
+  public static void createBooking() {
+
+  }
+
 
 
 

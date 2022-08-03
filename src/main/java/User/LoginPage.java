@@ -53,7 +53,6 @@ public class LoginPage {
     while(rs.next()) {
       if( username.equals(rs.getString("username"))
               && password.equals(rs.getString("password")) ){
-        System.out.println(username);
         isValidUser = true;
         userSIN = rs.getInt("SIN");
         break;
