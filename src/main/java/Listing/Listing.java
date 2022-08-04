@@ -12,6 +12,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.text.SimpleDateFormat;
 import java.util.stream.Collectors;
+import java.time.temporal.ChronoUnit;
+
 
 import Main.Main;
 import User.Host;
@@ -19,6 +21,7 @@ import User.Host;
 public class Listing {
   private static int Listing_ID = 0;
   private static Connection connection = ConnectionEstablish.ConnectToJDBC.getMySqlConnection();
+  private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
   private static Scanner scan = new Scanner(System.in);
   private static Statement st;
@@ -43,7 +46,7 @@ public class Listing {
     newListingScreenBanner();
     System.out.print("Specify the type of Listing. Enter 1 for Apartment, 2 for House, 3 for Rooms\n");
     type = scan.nextInt();
-    room_type = room_types[type-1];
+    room_type = room_types[type - 1];
     mapListingInfo.put(1, room_type);
 
     System.out.print("Apartment/Road Name: ");
@@ -86,23 +89,24 @@ public class Listing {
     redirectListingOptions();
 
   }
-    public static int get_Listing_ID() throws SQLException {
-      st = connection.createStatement();
 
-      String getAllUserQuery = "SELECT * FROM Listings";
-      rs = st.executeQuery(getAllUserQuery);
+  public static int get_Listing_ID() throws SQLException {
+    st = connection.createStatement();
 
-      while (rs.next()) {
-        if (longitude == rs.getInt("longitude")
-                && latitude == rs.getInt("latitude")) {
-          Listing_ID = rs.getInt("listing_ID");
-          break;
-        }
+    String getAllUserQuery = "SELECT * FROM Listings";
+    rs = st.executeQuery(getAllUserQuery);
+
+    while (rs.next()) {
+      if (longitude == rs.getInt("longitude")
+              && latitude == rs.getInt("latitude")) {
+        Listing_ID = rs.getInt("listing_ID");
+        break;
       }
-
-      return Listing_ID;
-
     }
+
+    return Listing_ID;
+
+  }
 
   public static List<LocalDate> getDatesBetween(LocalDate startDate, LocalDate endDate) {
 
@@ -117,8 +121,8 @@ public class Listing {
       // inserting into user table
 
       String insertIntoListingTbl = "INSERT into Listings(room_type, latitude, longitude, postal_code, city, country, apt_name\n " +
-      ")  values (" + "'" + room_type + "'" + "," + "'" + latitude + "'" + "," + "'" + longitude + "'"+  "," + "'" +"\n" +
-              zipcode + "'" + "," + "'" + city + "'" + "," + "'" + country + "'" + "," + "'" + apt_name +  "'" + ")";
+              ")  values (" + "'" + room_type + "'" + "," + "'" + latitude + "'" + "," + "'" + longitude + "'" + "," + "'" + "\n" +
+              zipcode + "'" + "," + "'" + city + "'" + "," + "'" + country + "'" + "," + "'" + apt_name + "'" + ")";
       System.out.println(insertIntoListingTbl);
       stmt1.executeUpdate(insertIntoListingTbl);
 
@@ -130,40 +134,27 @@ public class Listing {
       System.out.println(insertIntoOwnsTbl);
       stmt1.executeUpdate(insertIntoOwnsTbl);
 
-      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+      addAvailability();
 
-      LocalDate start = LocalDate.parse(startDate, formatter);
-      LocalDate ending = LocalDate.parse(endDate, formatter);
-      LocalDate end = ending.plusDays(1);
-      List<LocalDate> dates = getDatesBetween(start, end);
-
-      PreparedStatement ps;
-      String sqlQ;
-      int length = dates.size();
-      sqlQ = "INSERT INTO Calender VALUES (?,?,?)\n";
-      ps = connection.prepareStatement(sqlQ);
-      for (int i=0; i<length; i++){
-
-        Date sqlDate = Date.valueOf(dates.get(i));
-        ps.setDate(1, sqlDate);
-        ps.setInt(2, price);
-        ps.setInt(3, Listing_ID);
-        ps.executeUpdate();
-      }
-      ps.close();
-
-
-//      // inserting address
-//      String insertIntoAddress = "INSERT into Address(postal_code, city, country, apt_name\n) "
-//              + "values(" + "'" + zipcode + "'" + "," + "'" + city + "'" + "," + "'" + country + "'" + "," + "'" + apt_name +  "'" + ")";
-//      System.out.println(insertIntoAddress);
-//      stmt1.executeUpdate(insertIntoAddress);
-
-//      // inserting address
-//      String insertIntoHasAddress = "INSERT into has_address(postal_code, city, country, apt_name\n) "
-//              + "values(" + "'" + zipcode + "'" + "," + "'" + city + "'" + "," + "'" + country + "'" + "," + "'" + apt_name +  "'" + ")";
-//      System.out.println(insertIntoHasAddress);
-//      stmt1.executeUpdate(insertIntoHasAddress);
+//      LocalDate start = LocalDate.parse(startDate, formatter);
+//      LocalDate ending = LocalDate.parse(endDate, formatter);
+//      LocalDate end = ending.plusDays(1);
+//      List<LocalDate> dates = getDatesBetween(start, end);
+//
+//      PreparedStatement ps;
+//      String sqlQ;
+//      int length = dates.size();
+//      sqlQ = "INSERT INTO Calender VALUES (?,?,?)\n";
+//      ps = connection.prepareStatement(sqlQ);
+//      for (int i = 0; i < length; i++) {
+//
+//        Date sqlDate = Date.valueOf(dates.get(i));
+//        ps.setDate(1, sqlDate);
+//        ps.setInt(2, price);
+//        ps.setInt(3, Listing_ID);
+//        ps.executeUpdate();
+//      }
+//      ps.close();
 
       System.out.println("Gathering the information...");
       Thread.sleep(200);
@@ -177,13 +168,196 @@ public class Listing {
     }
   }
 
-  public static void updateListing() {
+  public static void updateListing() throws SQLException, InterruptedException {
     System.out.print("Specify the Listing ID of the listing that you want to update\n");
     Listing_ID = scan.nextInt();
 
-    
+    int selectedOption = 0;
+    System.out.print("Specify the operation\n");
+    System.out.println("1. Update the price");
+    System.out.println("2. Update the Available Dates");
+
+    try {
+      System.out.print("\nInput: ");
+      selectedOption = scan.nextInt();
+      scan.nextLine();
+    } catch (InputMismatchException ime) {
+      System.out.println("Input only numbers... Try again!!!");
+      System.out.println("Redirecting to Update menu...");
+      updateListing();
+    }
+
+    if (selectedOption == 1) {
+      System.out.print("Changing price of Listing from start-date to end-date\n");
+      System.out.print("Start Date (YYYY-MM-DD): ");
+      startDate = scan.nextLine();
+      System.out.print("End Date (YYYY-MM-DD): ");
+      endDate = scan.nextLine();
+
+      System.out.print("Updated Price: ");
+      price = scan.nextInt();
+      scan.nextLine();
+     // checkAvailability();
+      if (checkAvailability() == 1) {
+        updatePrice();
+      } else {
+        System.out.print("Given Dates are not available. Please try again\n");
+        Thread.sleep(500);
+        updateListing();
+      }
+    } else if (selectedOption == 2) {
+      System.out.print("Changing Availability of Listing from start-date to end-date\n");
+      Thread.sleep(500);
+      changeAvailability();
+    }
+
+  }
+
+  public static void changeAvailability() throws SQLException, InterruptedException {
+
+    int selectedOption = 0;
+    System.out.print("Choose an option below\n");
+    System.out.println("1. Add Availability for a Listing");
+    System.out.println("2. Remove Availability for a Listings");
+
+    try {
+      System.out.print("\nInput: ");
+      selectedOption = scan.nextInt();
+      scan.nextLine();
+    } catch (InputMismatchException ime) {
+      System.out.println("Input only numbers... Try again!!!");
+      System.out.println("Redirecting to Update menu...");
+      updateListing();
+    }
+
+    if (selectedOption == 1) {
+      System.out.println("I want my listing to be available from dates: \n");
+      System.out.print("Start Date (YYYY-MM-DD): ");
+      startDate = scan.nextLine();
+      System.out.print("End Date (YYYY-MM-DD): ");
+      endDate = scan.nextLine();
+      System.out.print("Price: ");
+      price = scan.nextInt();
+      scan.nextLine();
+
+      if (checkAvailability() == 1) {
+        System.out.print("Given Dates are already available. Please try again\n");
+        Thread.sleep(500);
+        changeAvailability();
+      }
+      else if (checkAvailability() == 0) {
+        System.out.print("Some of the given dates are already available. But some of them are not. " +
+                "Please specify the range of datees are not already available.\n");
+        Thread.sleep(500);
+        changeAvailability();
+      }
+      else {
+        addAvailability();
+      }
+
+    } else if (selectedOption == 2) {
+      System.out.println("I don't want my listing to be available from dates: \n");
+      System.out.print("Start Date (YYYY-MM-DD): ");
+      startDate = scan.nextLine();
+      System.out.print("End Date (YYYY-MM-DD): ");
+      endDate = scan.nextLine();
+
+      if (checkAvailability() == 1) {
+        removeAvailability();
+      } else {
+        System.out.print("Your listing is not available for these dates. Please try again\n");
+        changeAvailability();
+      }
+    }
 
   }
 
 
+  public static void removeAvailability() throws SQLException {
+
+    LocalDate start = LocalDate.parse(startDate, formatter);
+    LocalDate ending = LocalDate.parse(endDate, formatter);
+    LocalDate end = ending.plusDays(1);
+    st = connection.createStatement();
+
+    String sqlQ;
+    sqlQ = "DELETE FROM Calender WHERE date >= " + "'" + startDate + "'" + " AND date <= "
+            + "'" + endDate +  "'" + " AND listing_ID = " + Listing_ID + "\n";
+
+    System.out.println(sqlQ);
+    st.executeUpdate(sqlQ);
+
   }
+
+    public static void addAvailability() throws SQLException {
+
+    LocalDate start = LocalDate.parse(startDate, formatter);
+    LocalDate ending = LocalDate.parse(endDate, formatter);
+    LocalDate end = ending.plusDays(1);
+    List<LocalDate> dates = getDatesBetween(start, end);
+    st = connection.createStatement();
+
+    PreparedStatement ps;
+    String sqlQ;
+    int length = dates.size();
+    sqlQ = "INSERT INTO Calender VALUES (?,?,?)\n";
+    ps = connection.prepareStatement(sqlQ);
+    for (int i = 0; i < length; i++) {
+
+      Date sqlDate = Date.valueOf(dates.get(i));
+      ps.setDate(1, sqlDate);
+      ps.setInt(2, price);
+      ps.setInt(3, Listing_ID);
+      ps.executeUpdate();
+    }
+    ps.close();
+
+  }
+
+    public static Integer checkAvailability() throws SQLException {
+
+    LocalDate start = LocalDate.parse(startDate, formatter);
+    LocalDate ending = LocalDate.parse(endDate, formatter);
+    LocalDate end = ending.plusDays(1);
+    st = connection.createStatement();
+
+    String getAllDateQuery = "SELECT COUNT(*) FROM Calender WHERE date >= " + "'" + startDate + "'" + " AND date <= "
+            + "'" + endDate +  "'" + " AND listing_ID = " + Listing_ID + "\n";
+    System.out.println(getAllDateQuery);
+    ResultSet rs = st.executeQuery(getAllDateQuery);
+
+    int count = 0;
+    while(rs.next()) {
+      count = rs.getInt("COUNT(*)");
+    }
+    long noOfDaysBetween = ChronoUnit.DAYS.between(start, ending);
+    noOfDaysBetween = noOfDaysBetween + 1;
+
+    if (count == noOfDaysBetween ){
+      return 1;
+    } if (count == 0 ) {
+      return 2;
+    } else {
+      return 0;
+    }
+
+  }
+
+  public static void updatePrice() throws SQLException {
+    st = connection.createStatement();
+
+    LocalDate start = LocalDate.parse(startDate, formatter);
+    LocalDate ending = LocalDate.parse(endDate, formatter);
+    LocalDate end = ending.plusDays(1);
+    List<LocalDate> dates = getDatesBetween(start, end);
+    int length = dates.size();
+
+    String updatePriceQuery = "UPDATE Calender SET price = " +
+            price + " WHERE date >= " + "'" + startDate + "'" + " AND date <= "
+            + "'" + endDate +  "'" + " AND listing_ID = " + Listing_ID + "\n";
+    System.out.println(updatePriceQuery);
+    st.executeUpdate(updatePriceQuery);
+
+  }
+
+}

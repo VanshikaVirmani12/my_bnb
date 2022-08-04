@@ -13,7 +13,7 @@ public class Host {
 
   private static Scanner scan = new Scanner(System.in);
 
-  public static void startPage(){
+  public static void startPage() throws SQLException, InterruptedException {
 
     int selectedOption = 0;
 
@@ -50,13 +50,8 @@ public class Host {
     }else if(selectedOption == 2) {
      // User.NewRegistration.createNewUserAccount();
     }else if(selectedOption == 3){
-      System.out.println("Exiting the application...");
-      try {
-        Thread.sleep(500);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-      System.exit(0);
+      System.out.println("Updating Listing");
+      Listing.updateListing();
     } else {
       System.out.println("Invalid input... Try again!!!");
       System.out.println("Redirecting to LogIn page menu....");
