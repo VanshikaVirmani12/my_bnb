@@ -179,7 +179,7 @@ public class Filter {
     set_listing_array();
 
     if(updated_postal_code == 1){
-      set_postal_code(postal_code, distance);
+      set_postal_code();
       LISTING_SET.retainAll(postal_code_set);
     }
     if (updated_amenities == 1){
@@ -187,11 +187,11 @@ public class Filter {
       LISTING_SET.retainAll(amenities_set);
     }
     if(updated_location == 1){
-      set_location(longitude, latitude, distance);
+      set_location();
       LISTING_SET.retainAll(location_set);
     }
     if(updated_prices == 1){
-      set_prices(low_price, high_price);
+      set_prices();
       LISTING_SET.retainAll(prices_set);
     }
     if (updated_dates == 1){
@@ -201,7 +201,7 @@ public class Filter {
       LISTING_SET.retainAll(dates_set);
     }
     if(updated_address == 1) {
-      set_address(apt_name, city, country, postal_code);
+      set_address();
       LISTING_SET.retainAll(address_set);
     }
     // Now LISTING_SET has the filtered listing ids.
@@ -212,6 +212,8 @@ public class Filter {
   private static void print_listings() {
     // iterate over the listings in LISTING_SET and print data
     System.out.println("Hello, you reached the end");
+    int size = LISTING_SET.size();
+    System.out.println(LISTING_SET);
   }
 
 
@@ -293,9 +295,9 @@ public class Filter {
     }
   }
 
-  public static void set_prices(int price_low, int price_high) throws SQLException {
+  public static void set_prices() throws SQLException {
     sqlQ = "SELECT * from Calender\n" +
-            "\tWHERE price >= price_low AND price <= price_high\n" +
+            "\tWHERE price >= "+ "'"+ low_price+ "'"+ " AND price <= "+"'"+ high_price+"'"+ "\n" +
             "\tORDER BY price\n";
     rs = sql.executeQuery(sqlQ);
     while(rs.next()){
@@ -303,7 +305,7 @@ public class Filter {
     }
   }
 
-  public static void set_location(int lon_i, int lat_i, int distance) throws SQLException{
+  public static void set_location() throws SQLException{
     // define a default distance
     // order by distance
     sqlQ = "SELECT * from Listings\n";
@@ -313,29 +315,29 @@ public class Filter {
     while (rs.next()){
       double lon = rs.getDouble("longitude");
       double lat = rs.getDouble("latitude");
-      if (get_distance_lon_lat(lon_i, lat_i, lon, lat) <= distance){
+      if (get_distance_lon_lat(longitude, latitude, lon, lat) <= distance){
         location_set.add(rs.getInt("Listing_ID"));
       }
     }
   }
 
-  public static void set_postal_code(String postal_code_i, int distance) throws SQLException{
+  public static void set_postal_code() throws SQLException{
     // same or adjacent postal codes
     sqlQ = "SELECT * from has_address\n";
     System.out.println("Executing this filter_by_postal_code: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
     rs = sql.executeQuery(sqlQ);
 
     while (rs.next()){
-      String postal_code = rs.getString("postal_code");
-      if (get_distance_postal_code(postal_code, postal_code_i) <= distance){
+      String code = rs.getString("postal_code");
+      if (get_distance_postal_code(code, postal_code) <= distance){
         postal_code_set.add(rs.getInt("Listing_ID"));
       }
     }
   }
 
-  public static void set_address(String apt_name_i, String city_i, String country_i, String postal_code_i) throws SQLException {
+  public static void set_address() throws SQLException {
     sqlQ = "SELECT * from has_address\n" +
-            "\tWHERE apt_name LIKE apt_name_i AND city LIKE city_i AND country LIKE country_i AND postal_code LIKE postal_code_i\n";
+            "\tWHERE apt_name LIKE "+ "'"+ apt_name + "'"+" AND city LIKE "+ "'"+city + "'"+ " AND country LIKE "+"'"+ country +"'"+ " AND postal_code LIKE "+"'"+postal_code+"'"+"\n";
     System.out.println("Executing this filter_by_address: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
     rs = sql.executeQuery(sqlQ);
 
@@ -381,7 +383,7 @@ public class Filter {
   public static int get_distance_postal_code(String postal_code1, String postal_code2){
     int num1 = postal_code1.hashCode();
     int num2 = postal_code2.hashCode();
-    return num2 - num1;
+    return  Math.abs(num2 - num1);
   }
 
 
