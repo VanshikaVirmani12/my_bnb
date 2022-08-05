@@ -1,26 +1,21 @@
 package Filter;
-
+import User.Renter;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Date;
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.sql.ResultSet;
-
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.lang.*;
-import User.Renter;
+import static Listing.Listing.getDatesBetween;
 
 public class Filter {
-
   private static int Booking_ID = 0;
-  private static Connection connection = ConnectionEstablish.ConnectToJDBC.getMySqlConnection();
-
-  private static Scanner scan = new Scanner(System.in);
-
-  private static Statement st;
-  private static ResultSet rs;
-
   private static String apt_name = null, city = null, country = null, postal_code = null;
   private static int longitude;
   private static int latitude;
@@ -34,14 +29,12 @@ public class Filter {
   private static int has_washer;
   private static int has_wifi;
   private static int distance = 10;
-
   private static int updated_dates = 0; // prompt the user when booking
   private static int updated_address = 0;
   private static int updated_postal_code = 0;
   private static int updated_prices = 0;
   private static int updated_location = 0;
   private static int updated_amenities = 0;
-
   private static String sql_dates = "";
   private static String sql_address = "";
   private static String sql_postal_code = "";
@@ -49,9 +42,23 @@ public class Filter {
   private static String sql_location = "";
   private static String sql_amenities = "";
   private static String QUERY ="";
+  private static String sqlQ = "";
+  private static Connection connection = ConnectionEstablish.ConnectToJDBC.getMySqlConnection();
+  private static Scanner scan = new Scanner(System.in);
+  private static Statement st;
+  private static ResultSet rs;
+  static PreparedStatement ps;
+  static Statement sql;
+  static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY-MM-DD");
 
-
-
+  // List that will contain filtered listing_ids
+  static Set<Integer> LISTING_SET = new HashSet<Integer> ();
+  static Set<Integer> postal_code_set = new HashSet<Integer> ();
+  static Set<Integer> address_set = new HashSet<Integer> ();
+  static Set<Integer> location_set = new HashSet<Integer> ();
+  static Set<Integer> prices_set = new HashSet<Integer> ();
+  static Set<Integer> amenities_set = new HashSet<Integer> ();
+  static Set<Integer> dates_set = new HashSet<Integer> ();
 
   public Filter() throws SQLException {
     this.city = city;
@@ -70,28 +77,18 @@ public class Filter {
     this.has_ac = has_ac;
     this.longitude = longitude;
     this.latitude = latitude;
-
   }
 
-  PreparedStatement ps;
 
-  Statement sql = connection.createStatement();
+  static {
+    try {
+      sql = connection.createStatement();
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
-  //---------------------------------------------------------------------------------------
-  //Create jdbc_demo table
-  String sqlQ;
-
-//  public boolean filter_by_address(String city, String country, String apt_name) {
-//    if (this.city.equalsIgnoreCase(city) && this.country.equalsIgnoreCase(country) &&
-//            this.apt_name.equalsIgnoreCase(apt_name)) {
-//      return true;
-//    }
-//    return false;
-//  }
-
-
-  // Initialize user data
-
+  //------------------------------------------GETTING DATA FROM USER--------------------------------------------
   public static void get_address(){
     System.out.println("Please type in the address:");
     System.out.print("Apt Name: ");
@@ -104,7 +101,6 @@ public class Filter {
     postal_code = scan.next();
     updated_address = 1;
   }
-
 
   public static void get_dates(){
     System.out.println("Please type in the dates:");
@@ -166,156 +162,196 @@ public class Filter {
     updated_amenities = 1;
   }
 
+  //------------------------------------------FILTER LISTING--------------------------------------------
   public static void filter_listings() throws SQLException {
-    // get the sql query and just execute and print data
-    // after executing make all variables null
-    st = connection.createStatement();
-    rs = st.executeQuery(QUERY);
-    while( rs.next()){
-      if(updated_postal_code == 1){
-        System.out.print("Postal Code: "+rs.getString("postal_code") +", ");
-      }
-      if (updated_amenities == 1){
-        System.out.print("Amenities: "+rs.getString("") +", "); // HOW TO PRINT AMENITIES
-      }
-      if(updated_location == 1){
-        System.out.print("Longitude: "+rs.getString("longitude") +", ");
-        System.out.print("Latitude: "+rs.getString("latitude") +", ");
-      }
-      if(updated_prices == 1){
-        System.out.print("Price: "+rs.getString("price") +", ");
-      }
-      if (updated_dates == 1){
-        System.out.print("Listing Id: "+rs.getString("") +", "); // HOW TO PRINT DATES
-      }
-      if(updated_address == 1){
-        System.out.print("Apt Name: "+rs.getString("apt_name") +", ");
-        System.out.print("City: "+rs.getString("city") +", ");
-        System.out.print("Country: "+rs.getString("country") +", ");
-      }
-      System.out.print("Listing Id: "+rs.getString("listing_ID"));
+    // Display first 20 listings
+    int empty = updated_address+updated_dates+updated_prices+updated_location+updated_amenities+updated_postal_code;
+    if (empty == 0){
+      System.out.println("No filter applied! here are the first 20 results from listing: ");
+      // Display the first 20 listings and return to the filters page
+      System.exit(0);
     }
+
+//    st = connection.createStatement();
+//    rs = st.executeQuery(QUERY);
+
+    // Fill the LISTING_ARRAY
+    set_listing_array();
+
+    if(updated_postal_code == 1){
+      set_postal_code(postal_code, distance);
+      LISTING_SET.retainAll(postal_code_set);
+    }
+    if (updated_amenities == 1){
+      set_amenities(has_ac,has_dryer, has_kitchen, has_washer, has_wifi);
+      LISTING_SET.retainAll(amenities_set);
+    }
+    if(updated_location == 1){
+      set_location(longitude, latitude, distance);
+      LISTING_SET.retainAll(location_set);
+    }
+    if(updated_prices == 1){
+      set_prices(low_price, high_price);
+      LISTING_SET.retainAll(prices_set);
+    }
+    if (updated_dates == 1){
+      LocalDate StartDate = LocalDate.parse(start_date, formatter);
+      LocalDate EndDate = LocalDate.parse(end_date, formatter);
+      set_dates(StartDate,EndDate);
+      LISTING_SET.retainAll(dates_set);
+    }
+    if(updated_address == 1) {
+      set_address(apt_name, city, country, postal_code);
+      LISTING_SET.retainAll(address_set);
+    }
+    // Now LISTING_SET has the filtered listing ids.
+
+    print_listings();
   }
 
-  public static void get_sql_query(){
-    // get sql strings and intersect them
-    // get and array of the sql strings with non-empty ones
-    // iterate over and put intersect between them
-    String[] query_arr = {sql_prices, sql_location, sql_address, sql_dates, sql_amenities, sql_postal_code};
-    int non_empty = updated_address+updated_dates+updated_prices+updated_location+updated_amenities+updated_postal_code;
-    int i = 0;
-    while (non_empty -1 >0){
-      if (!query_arr[i].equals("")){
-        query_arr[i].concat(" INTERSECT ");
-        QUERY.concat(query_arr[i]);
-        non_empty = non_empty -1;
-      }
-      i++;
-    }
-    while (i < 6){
-      if (!query_arr[i].equals("")){
-        QUERY.concat(query_arr[i]);
-        i = 100;
-      }
-      i++;
-    }
-
-  }
-
-  public static void getting_sql_strings(){
-    if (updated_amenities != 0){
-      sql_amenities = "SELECT * from Amenities";
-    }
-    if (updated_postal_code != 0){
-      sql_postal_code = "SELECT * from Listings";
-    }
-    if (updated_location != 0){
-      sql_location = "SELECT * from Listings";
-    }
-    if (updated_prices != 0){
-      sql_prices = "SELECT * from Calendar";
-    }
-    if (updated_dates != 0){
-      sql_dates = "SELECT * from Calendar";
-    }
-    if (updated_address != 0){
-      sql_address = "SELECT * from Listing";
-    }
-  }
-
-  public static void book_listing(){
-    System.out.print("Please enter the listing ID for the listing you want to book:");
-    int listing_id = scan.nextInt();
+  private static void print_listings() {
+    // iterate over the listings in LISTING_SET and print data
+    System.out.println("Hello, you reached the end");
   }
 
 
-  public String filter_by_price_range(int price_low, int price_high) throws SQLException {
+  //------------------------------------------BOOKING A LISTING--------------------------------------------
+  public static void book_listing() throws SQLException, ParseException {
+    System.out.print("Please enter the listing ID for the listing you want to book: ");
+    int id = scan.nextInt();
+    if (updated_dates == 0){
+      System.out.println("PLease specify the days you want to book for: ");
+      System.out.print("Start date: ");
+      start_date = scan.next();
+      System.out.print("End date: ");
+      end_date = scan.next();
+      int availability = checkAvailability(id);
+      if (availability != 0){ // what number is when no availability
+        reset_global_variables();
+        System.out.println("The listing for the chosen dates aren't available :(");
+        System.out.println("To enter another set of dates enter 1. To return to filters page, enter 2");
+        int choice = scan.nextInt();
+        if (choice == 1){
+          book_listing();
+        }else{
+          reset_global_variables();
+          Renter.selectFilter();
+        }
+      }
+    }
+    // Valid Listing
+    // Insert the listing id with dates and renter Id into the table "booking"
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY-MM-DD");
+    //convert String to LocalDate
+    LocalDate StartDate = LocalDate.parse(start_date, formatter);
+    LocalDate EndDate = LocalDate.parse(end_date, formatter);
+    List<LocalDate> dates = getDatesBetween(StartDate, EndDate);
+
+    int length = dates.size();
+
+    String q = "INSERT INTO Bookings VALUES(?, ?, ?)\n";
+    int renter_id = User.LoginPage.getSIN();
+    ps = connection.prepareStatement(q);
+
+    for (int i = 0; i < length; i++){
+
+      Date d = Date.valueOf(dates.get(i));
+      ps.setDate(1, d);
+      ps.setInt(2, id);
+      ps.setInt(3, renter_id);
+      ps.executeQuery();
+    }
+    ps.close();
+  }
+
+  //------------------------------------------RESETTING GLOBAL VARIABLES--------------------------------------------
+  private static void reset_global_variables() {
+    updated_dates = 0; // prompt the user when booking
+    updated_address = 0;
+    updated_postal_code = 0;
+    updated_prices = 0;
+    updated_location = 0;
+    updated_amenities = 0;
+    sql_dates = "";
+    sql_address = "";
+    sql_postal_code = "";
+    sql_prices = "";
+    sql_location = "";
+    sql_amenities = "";
+    QUERY ="";
+    LISTING_SET.clear();
+  }
+
+  //----------------------------------------------SETTING SETS-----------------------------------------------------
+
+  public static void set_listing_array() throws SQLException {
+    sqlQ = "SELECT * from Listings\n";
+    System.out.println("Setting listing_array: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
+    rs = sql.executeQuery(sqlQ);
+    while(rs.next()){
+      LISTING_SET.add(rs.getInt("Listing_ID"));
+    }
+  }
+
+  public static void set_prices(int price_low, int price_high) throws SQLException {
     sqlQ = "SELECT * from Calender\n" +
             "\tWHERE price >= price_low AND price <= price_high\n" +
             "\tORDER BY price\n";
-    return sqlQ;
-
+    rs = sql.executeQuery(sqlQ);
+    while(rs.next()){
+      prices_set.add(rs.getInt("Listing_ID"));
+    }
   }
 
-  public void filter_by_long_lat(int lon_i, int lat_i, int distance) throws SQLException{
+  public static void set_location(int lon_i, int lat_i, int distance) throws SQLException{
     // define a default distance
     // order by distance
     sqlQ = "SELECT * from Listings\n";
     System.out.println("Executing this filter_by_long_lat: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
     rs = sql.executeQuery(sqlQ);
 
-//    while (rs.next()){
-//      double lon = rs.getDouble("longitude");
-//      double lat = rs.getDouble("latitude");
-//      if (get_distance_lon_lat(lon_i, lat_i, lon, lat) <= distance){
-//        System.out.print("Listing Id: "+rs.getString("listing_ID") +", ");
-//        System.out.print("Longitude: "+lon+", ");
-//        System.out.println("Latitude: "+lat);
-//      }
-//    }
+    while (rs.next()){
+      double lon = rs.getDouble("longitude");
+      double lat = rs.getDouble("latitude");
+      if (get_distance_lon_lat(lon_i, lat_i, lon, lat) <= distance){
+        location_set.add(rs.getInt("Listing_ID"));
+      }
+    }
   }
 
-  public void filter_by_postal_code(String postal_code_i, int distance) throws SQLException{
+  public static void set_postal_code(String postal_code_i, int distance) throws SQLException{
     // same or adjacent postal codes
     sqlQ = "SELECT * from has_address\n";
     System.out.println("Executing this filter_by_postal_code: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
     rs = sql.executeQuery(sqlQ);
 
-//    while (rs.next()){
-//      String postal_code = rs.getString("postal_code");
-//      if (get_distance_postal_code(postal_code, postal_code_i) <= distance){
-//        System.out.print("Listing Id: "+rs.getString("listing_ID") +", ");
-//        System.out.println("Postal Code: "+postal_code);
-//      }
-//    }
+    while (rs.next()){
+      String postal_code = rs.getString("postal_code");
+      if (get_distance_postal_code(postal_code, postal_code_i) <= distance){
+        postal_code_set.add(rs.getInt("Listing_ID"));
+      }
+    }
   }
 
-  public void filter_by_address(String apt_name_i, String city_i, String country_i, String postal_code_i) throws SQLException {
+  public static void set_address(String apt_name_i, String city_i, String country_i, String postal_code_i) throws SQLException {
     sqlQ = "SELECT * from has_address\n" +
             "\tWHERE apt_name LIKE apt_name_i AND city LIKE city_i AND country LIKE country_i AND postal_code LIKE postal_code_i\n";
     System.out.println("Executing this filter_by_address: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
     rs = sql.executeQuery(sqlQ);
 
-//    while (rs.next()){
-//      System.out.print("Listing Id: "+rs.getString("listing_ID") +", ");
-//      System.out.print("Apt Name: "+rs.getString("apt_name") +", ");
-//      System.out.print("City: "+rs.getString("city") +", ");
-//      System.out.print("Country: "+rs.getString("country") +", ");
-//      System.out.print("Postal Code: "+rs.getString("postal_code"));
-//    }
+    while (rs.next()){
+      address_set.add(rs.getInt("Listing_ID"));
+    }
   }
 
-  public void filter_by_date_range(Date start_date, Date end_date) throws SQLException {
-    sqlQ = "";
+  public static void set_dates(LocalDate start_date, LocalDate end_date) throws SQLException {
+    sqlQ = "SELECT * from Calender\n";
+
     System.out.println("Executing this filter_by_date_range: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
     rs = sql.executeQuery(sqlQ);
-
-//    while (rs.next()){
-//      // Print the data
-//    }
   }
 
-  public void filter_by_amenities(boolean has_ac, boolean has_dryer, boolean has_kitchen, boolean has_washer, boolean has_wifi) throws SQLException {
+  public static void set_amenities(int has_ac, int has_dryer, int has_kitchen, int has_washer, int has_wifi) throws SQLException {
     sqlQ = "";
     System.out.println("Executing this filter_by_amenities: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
     rs = sql.executeQuery(sqlQ);
@@ -325,10 +361,10 @@ public class Filter {
 //    }
   }
 
+  //------------------------------------------HELPER FUNCTIONS--------------------------------------------
 
-  // Helper functions
-
-  public double get_distance_lon_lat(double lon1, double lat1, double lon2, double lat2){
+  // Getting distance between 2 coordinates
+  public static double get_distance_lon_lat(double lon1, double lat1, double lon2, double lat2){
 
     double dlon = Math.toRadians(lon2) - Math.toRadians(lon1);
     double dlat = Math.toRadians(lat2) - Math.toRadians(lat1);
@@ -341,14 +377,42 @@ public class Filter {
 
   }
 
-  public int get_distance_postal_code(String postal_code1, String postal_code2){
+  // Getting distance between 2 postal codes
+  public static int get_distance_postal_code(String postal_code1, String postal_code2){
     int num1 = postal_code1.hashCode();
     int num2 = postal_code2.hashCode();
     return num2 - num1;
   }
 
 
-  // Combining filters
+  // Checking availability of a date
+  public static Integer checkAvailability(int listing_id) throws SQLException {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY-MM-DD");
+    LocalDate start = LocalDate.parse(start_date, formatter);
+    LocalDate ending = LocalDate.parse(end_date, formatter);
+    LocalDate end = ending.plusDays(1);
+    st = connection.createStatement();
+
+    String getAllDateQuery = "SELECT COUNT(*) FROM Calender WHERE date >= " + "'" + start_date + "'" + " AND date <= "
+            + "'" + end_date +  "'" + " AND listing_ID = " + listing_id + "\n";
+    System.out.println(getAllDateQuery);
+    ResultSet rs = st.executeQuery(getAllDateQuery);
+
+    int count = 0;
+    while(rs.next()) {
+      count = rs.getInt("COUNT(*)");
+    }
+    long noOfDaysBetween = ChronoUnit.DAYS.between(start, ending);
+    noOfDaysBetween = noOfDaysBetween + 1;
+
+    if (count == noOfDaysBetween ){
+      return 1; // on success
+    } if (count == 0 ) {
+      return 2;
+    } else {
+      return 0;
+    }
+  }
 
 
 }
