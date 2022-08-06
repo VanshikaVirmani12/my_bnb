@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
 import java.util.Scanner;
 
 import ConnectionEstablish.ConnectToJDBC;
@@ -32,7 +33,7 @@ public class LoginPage {
     password = scan.nextLine();
     try {
       validateUser(renter);
-    } catch (InterruptedException e) {
+    } catch (InterruptedException | ParseException e) {
       e.printStackTrace();
     }
   }
@@ -42,7 +43,7 @@ public class LoginPage {
     return userSIN;
   }
 
-  public static void validateUser(Boolean renter) throws SQLException, InterruptedException {
+  public static void validateUser(Boolean renter) throws SQLException, InterruptedException, ParseException {
     st = connection.createStatement();
 
     String getAllUserQuery = "SELECT * FROM User";
