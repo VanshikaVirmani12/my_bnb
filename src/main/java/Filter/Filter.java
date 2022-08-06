@@ -13,6 +13,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.lang.*;
 import static Listing.Listing.getDatesBetween;
+import static Listing.Listing.get_Listing_ID;
 
 public class Filter {
   private static int Booking_ID = 0;
@@ -183,7 +184,7 @@ public class Filter {
       LISTING_SET.retainAll(postal_code_set);
     }
     if (updated_amenities == 1){
-      set_amenities(has_ac,has_dryer, has_kitchen, has_washer, has_wifi);
+      set_amenities();
       LISTING_SET.retainAll(amenities_set);
     }
     if(updated_location == 1){
@@ -287,7 +288,7 @@ public class Filter {
   //----------------------------------------------SETTING SETS-----------------------------------------------------
 
   public static void set_listing_array() throws SQLException {
-    sqlQ = "SELECT * from Listings\n";
+    sqlQ = "SELECT * from listings\n";
     System.out.println("Setting listing_array: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
     rs = sql.executeQuery(sqlQ);
     while(rs.next()){
@@ -308,7 +309,7 @@ public class Filter {
   public static void set_location() throws SQLException{
     // define a default distance
     // order by distance
-    sqlQ = "SELECT * from Listings\n";
+    sqlQ = "SELECT * from listings\n";
     System.out.println("Executing this filter_by_long_lat: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
     rs = sql.executeQuery(sqlQ);
 
@@ -323,7 +324,7 @@ public class Filter {
 
   public static void set_postal_code() throws SQLException{
     // same or adjacent postal codes
-    sqlQ = "SELECT * from has_address\n";
+    sqlQ = "SELECT * from listings\n";
     System.out.println("Executing this filter_by_postal_code: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
     rs = sql.executeQuery(sqlQ);
 
@@ -336,7 +337,7 @@ public class Filter {
   }
 
   public static void set_address() throws SQLException {
-    sqlQ = "SELECT * from has_address\n" +
+    sqlQ = "SELECT * from listings\n" +
             "\tWHERE apt_name LIKE "+ "'"+ apt_name + "'"+" AND city LIKE "+ "'"+city + "'"+ " AND country LIKE "+"'"+ country +"'"+ " AND postal_code LIKE "+"'"+postal_code+"'"+"\n";
     System.out.println("Executing this filter_by_address: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
     rs = sql.executeQuery(sqlQ);
@@ -357,19 +358,53 @@ public class Filter {
       if (avail == 1){
         dates_set.add(listing);
         System.out.println(listing);
-        System.out.println(dates_set);
+        //System.out.println(dates_set);
       }
     }
   }
 
-  public static void set_amenities(int has_ac, int has_dryer, int has_kitchen, int has_washer, int has_wifi) throws SQLException {
+  public static void set_amenities() throws SQLException {
+    ArrayList<String> desired_amenities = new ArrayList<String>();;
+    if (has_ac == 1){
+      desired_amenities.add("Air-conditioning");
+    }if(has_dryer == 1){
+      desired_amenities.add("Dryer");
+    }if (has_kitchen == 1){
+      desired_amenities.add("Kitchen");
+    }if (has_wifi == 1){
+      desired_amenities.add("Wifi");
+    }if (has_washer == 1){
+      desired_amenities.add("Washer");
+    }
+    int size = desired_amenities.size();
+    String q = "SELECT * from Amenities\n";
+    rs = sql.executeQuery(q);
+    int is_there; // initially set to true, if not found, turns to 0
+    ResultSet temp_rs; // temp result set
+    while (rs.next()){
+      is_there = 1;
+      int listing_id = rs.getInt("listing_ID");
+      for (int i = 0; i < size; i++){
+        sqlQ = "SELECT * from Amenities" +
+                "\tWHERE amenity_type LIKE "+ "'"+ desired_amenities.get(i) +"'"+" AND listing_ID = " + "'" + listing_id + "'" +"\n";
+        temp_rs = sql.executeQuery(sqlQ);
+        if (temp_rs.first() == false){
+          is_there = 0;
+        }
+        if (is_there == 1){
+          dates_set.add(listing_id);
+        }
+      }
+
+    }
+
     sqlQ = "";
     System.out.println("Executing this filter_by_amenities: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
     rs = sql.executeQuery(sqlQ);
 
-//    while (rs.next()){
-//      // Print the data
-//    }
+    while (rs.next()){
+      // Print the data
+    }
   }
 
   //------------------------------------------HELPER FUNCTIONS--------------------------------------------
@@ -392,6 +427,8 @@ public class Filter {
   public static int get_distance_postal_code(String postal_code1, String postal_code2){
     int num1 = postal_code1.hashCode();
     int num2 = postal_code2.hashCode();
+    System.out.print(num1);
+    System.out.println(", "+ num2);
     return  Math.abs(num2 - num1);
   }
 
