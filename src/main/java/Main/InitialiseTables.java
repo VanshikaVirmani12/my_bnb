@@ -277,10 +277,9 @@ public class InitialiseTables {
       sqlQ = "create table owns(\n" +
               "\tSIN integer,\n" +
               "\tlisting_ID integer NOT NULL AUTO_INCREMENT,\n" +
-              "\tprimary key(listing_ID, SIN),\n" +
-              "\tFOREIGN KEY (SIN) REFERENCES User(SIN))\n";
+              "\tprimary key(listing_ID, SIN), index(listing_ID), index(SIN),\n" +
+              "\tFOREIGN KEY (SIN) REFERENCES User(SIN),\n" +
               "\tFOREIGN KEY (listing_ID) REFERENCES Listings(listing_ID))\n";
-
 
       sql.executeUpdate(sqlQ);
 

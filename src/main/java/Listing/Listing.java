@@ -181,6 +181,20 @@ public class Listing {
       Statement stmt1 = connection.createStatement();
       // inserting into user table
 
+//      String SQLq = "SELECT 1 FROM Listings WHERE latitude=" + latitude + " AND longitude=" +
+//              "" + longitude + " AND apt_name='" + apt_name + "'";
+//      System.out.println(SQLq);
+//      rs = st.executeQuery(SQLq);
+//
+//      int count = 0;
+//      while (rs.next()) {
+//        count = rs.getInt("1");
+//      }
+//      System.out.println(count);
+//      if (count != 0) {
+//        System.out.println("A listing at this location (latitude, longitude, apartment name) exists already. Kindly try again.\n");
+//        createNewListing();
+//      }
       String insertIntoListingTbl = "INSERT into Listings(room_type, latitude, longitude, postal_code, city, country, apt_name\n " +
               ")  values (" + "'" + room_type + "'" + "," + "'" + latitude + "'" + "," + "'" + longitude + "'" + "," + "'" + "\n" +
               zipcode + "'" + "," + "'" + city + "'" + "," + "'" + country + "'" + "," + "'" + apt_name + "'" + ")";
@@ -190,13 +204,13 @@ public class Listing {
       Listing_ID = get_Listing_ID();
 
       int SIN = User.LoginPage.getSIN();
+
       String insertIntoOwnsTbl = "INSERT into owns(SIN, listing_ID)\n " +
               "values (" + "'" + SIN + "'" + "," + "'" + Listing_ID + "'" + ")";
       System.out.println(insertIntoOwnsTbl);
       stmt1.executeUpdate(insertIntoOwnsTbl);
 
       addAvailability();
-
       addAmenities();
 
 //      LocalDate start = LocalDate.parse(startDate, formatter);
@@ -334,7 +348,7 @@ public class Listing {
   }
 
 
-  public static void removeAvailability() throws SQLException {
+  public static void removeAvailability() throws SQLException, InterruptedException {
 
     LocalDate start = LocalDate.parse(startDate, formatter);
     LocalDate ending = LocalDate.parse(endDate, formatter);
@@ -347,10 +361,11 @@ public class Listing {
 
     System.out.println(sqlQ);
     st.executeUpdate(sqlQ);
+    Host.startPage();
 
   }
 
-  public static void addAvailability() throws SQLException {
+  public static void addAvailability() throws SQLException, InterruptedException {
 
     LocalDate start = LocalDate.parse(startDate, formatter);
     LocalDate ending = LocalDate.parse(endDate, formatter);
@@ -372,6 +387,7 @@ public class Listing {
       ps.executeUpdate();
     }
     ps.close();
+    Host.startPage();
 
   }
 
@@ -405,7 +421,7 @@ public class Listing {
 
   }
 
-  public static void updatePrice() throws SQLException {
+  public static void updatePrice() throws SQLException, InterruptedException {
     st = connection.createStatement();
 
     LocalDate start = LocalDate.parse(startDate, formatter);
@@ -419,10 +435,11 @@ public class Listing {
             + "'" + endDate + "'" + " AND listing_ID = " + Listing_ID + "\n";
     System.out.println(updatePriceQuery);
     st.executeUpdate(updatePriceQuery);
+    Host.startPage();
 
   }
 
-  public static void viewYourListings() throws SQLException {
+  public static void viewYourListings() throws SQLException, InterruptedException {
     System.out.print("Here are all the listings that you own\n");
 
     st = connection.createStatement();
@@ -452,46 +469,52 @@ public class Listing {
       System.out.println("City = " + city);
       System.out.println("Country = " + country);
       System.out.println("Postal code = " + postal);
+
+//      String st1 = "SELECT * \n" +
+//              "FROM Calender\n" +
+//              "INNER JOIN Listings ON Listings.listing_ID = Calender.listing_ID " +
+//              "WHERE Calender.listing_ID=" + listing_ID + "\n";
+//
+//      System.out.println(st1);
+//      ResultSet result = st.executeQuery(st1);
+//
+//      int price;
+//      DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+//
+//      result.next();
+//      price = result.getInt("price");
+//
+//      Date start = result.getDate("date");
+//      Date date = start;
+//      Date end = start;
+//
+//      while(result.next()) {
+//        int new_price = result.getInt("price");
+//        date =  result.getDate("date");
+//        if (new_price != price) {
+//          end = date;
+//          String s = dateFormat.format(start);
+//          String e = dateFormat.format(end);
+//          System.out.println("Available from = " + start + " to " + end + " for price " + price);
+//          start.setDate(end.getDate() + 1);
+//          price = new_price;
+//        }
+//      }
+//      end = date;
+//      String s = dateFormat.format(start);
+//      String e = dateFormat.format(end);
+//      System.out.println("Available from = " + start + " to " + end + " for price " + price);
+
       System.out.println("-----------------------------------------------\n");
 
-
-      sqlQ = "SELECT * \n" +
-              "FROM Calender\n" +
-              "INNER JOIN Listings ON Listings.listing_ID = Calender.listing_ID " +
-              "WHERE Calender.listing_ID=" + listing_ID + "\n";
-
-      System.out.println(sqlQ);
-      ResultSet result = st.executeQuery(sqlQ);
-
-      String start, end, date;
-      int price;
-
-      start = startDate;
-      date = start;
-      price = result.getInt("price");
-      DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
-
-
-      while (date != endDate) {
-        int new_price = result.getInt("price");
-        if (price != new_price) {
-          end = date;
-          System.out.println("Available from = " + start + " to " + end + " for price " + price);
-          start = date;
-          LocalDate starting = LocalDate.parse(start, formatter);
-          starting = starting.plusDays(1);
-          start = dateFormat.format(date);
-        }
-      }
-      end = date;
-      System.out.println("Available from = " + start + " to " + end + " for price " + price);
-
     }
+
+    Host.startPage();
 
   }
 
 
-    public static void removeListing() throws SQLException {
+    public static void removeListing() throws SQLException, InterruptedException {
     System.out.print("Specify the Listing ID of the listing that you want to delete. CAUTION: This listing" +
             "and all information related to this listing will be permanently deleted\n");
     Listing_ID = scan.nextInt();
@@ -524,6 +547,7 @@ public class Listing {
     sqlQ = "DELETE FROM Review WHERE listing_ID = " + Listing_ID + "\n";
     System.out.println(sqlQ);
     st.executeUpdate(sqlQ);
+    Host.startPage();
 
   }
 
