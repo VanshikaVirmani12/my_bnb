@@ -186,8 +186,11 @@ public class Filter {
       LISTING_SET.retainAll(postal_code_set);
     }
     if (updated_amenities == 1){
+      System.out.println(LISTING_SET);
       set_amenities();
+      System.out.println(amenities_set);
       LISTING_SET.retainAll(amenities_set);
+      System.out.println(LISTING_SET);
     }
     if(updated_location == 1){
       set_location();
@@ -411,7 +414,7 @@ public class Filter {
   }
 
   public static void set_amenities() throws SQLException {
-    ArrayList<String> desired_amenities = new ArrayList<String>();;
+    ArrayList<String> desired_amenities = new ArrayList<String>();
     if (has_ac == 1){
       desired_amenities.add("Air-conditioning");
     }if(has_dryer == 1){
@@ -423,34 +426,46 @@ public class Filter {
     }if (has_washer == 1){
       desired_amenities.add("Washer");
     }
-    int size = desired_amenities.size();
-    String q = "SELECT * from Amenities\n";
-    rs = sql.executeQuery(q);
-    int is_there; // initially set to true, if not found, turns to 0
-    ResultSet temp_rs; // temp result set
-    while (rs.next()){
-      is_there = 1;
-      int listing_id = rs.getInt("listing_ID");
-      for (int i = 0; i < size; i++){
-        sqlQ = "SELECT * from Amenities" +
-                "\tWHERE amenity_type LIKE "+ "'"+ desired_amenities.get(i) +"'"+" AND listing_ID = " + "'" + listing_id + "'" +"\n";
-        temp_rs = sql.executeQuery(sqlQ);
-        if (temp_rs.first() == false){
-          is_there = 0;
+    int is_there = 1; // initially set to true, if not found, turns to 0
+    for (int listing_id : LISTING_SET) {
+      ArrayList<String> has_aminites = new ArrayList<String>();
+      sqlQ = "SELECT amenity_type from Amenities where  listing_ID = " + "'" + listing_id + "'" + "\n";
+      rs = sql.executeQuery(sqlQ);
+      System.out.println("Executing this filter_by_amenities: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
+      while (rs.next()) {
+        //is_there = 1;
+        String amenity_name = rs.getString("amenity_type");
+        has_aminites.add(amenity_name);
+        //System.out.println(has_aminites);
+      }
+//      for (String amen : desired_amenities) {
+//        if (has_aminites.isEmpty() || !has_aminites.contains(amen)) {
+//          is_there = 0;
+//          break;
+//        }
+//      }
+
+      for (String amen : desired_amenities ) {
+        if (listing_id == 2){
+          System.out.println(amen);
+          System.out.print(has_aminites);
+          System.out.println(has_aminites.contains(amen));
         }
-        if (is_there == 1){
-          dates_set.add(listing_id);
+
+        if (has_aminites.contains(amen) == false) {
+          is_there = 0;
+          break;
         }
       }
 
-    }
+      if (listing_id == 2){
+        System.out.println("Has amenites for 2" + has_aminites);
+        System.out.println("Is there?///// " + is_there);
+      }
 
-    sqlQ = "";
-    System.out.println("Executing this filter_by_amenities: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
-    rs = sql.executeQuery(sqlQ);
-
-    while (rs.next()){
-      // Print the data
+      if (is_there == 1) {
+        amenities_set.add(listing_id);
+      }
     }
   }
 
@@ -505,6 +520,22 @@ public class Filter {
     } else {
       return 0;
     }
+  }
+
+  public static void removeAvailability(int Listing_ID) throws SQLException {
+
+    LocalDate start = LocalDate.parse(start_date, formatter);
+    LocalDate ending = LocalDate.parse(end_date, formatter);
+    LocalDate end = ending.plusDays(1);
+    st = connection.createStatement();
+
+    String sqlQ;
+    sqlQ = "DELETE FROM Calender WHERE date >= " + "'" + start_date + "'" + " AND date <= "
+            + "'" + end_date + "'" + " AND listing_ID = " + Listing_ID + "\n";
+
+    System.out.println(sqlQ);
+    st.executeUpdate(sqlQ);
+
   }
 
 
