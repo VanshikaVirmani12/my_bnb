@@ -19,7 +19,7 @@ public class InitialiseTables {
       String sqlQ;
       sqlQ = "SET FOREIGN_KEY_CHECKS = 0\n";
       sql.executeUpdate(sqlQ);
-      sqlQ = "DROP TABLE IF EXISTS Listings, Student, Course, Offering,Took, Calender, has_availability, Address, has_address, Amenities, has_amenities, User, owns, rents, Review, Renter, Host\n";
+      sqlQ = "DROP TABLE IF EXISTS Listings, Student, Course, Offering,Took, Calender, has_availability, Address, has_address, Amenities, has_amenities, User, owns, rents, Review, Renter, Host, Bookings\n";
       sql.executeUpdate(sqlQ);
       PreparedStatement ps;
 
@@ -359,6 +359,21 @@ public class InitialiseTables {
         ps.executeUpdate();
       }
       ps.close();
+
+      sqlQ = "create table Bookings(\n" +
+              "\tlisting_ID integer,\n" +
+              "\trenter_ID integer,\n" +
+              "\tdate Date,\n" +
+              "\tprimary key(listing_ID, renter_ID, date))\n";
+
+      sql.executeUpdate(sqlQ);
+
+      sqlQ = "INSERT INTO Bookings (listing_ID, renter_ID, date) VALUES (1000, 10, '2022-01-01'),\n" +
+              "(11, 10, '2022-01-02')\n";
+
+      sql.executeUpdate(sqlQ);
+
+
 
     } catch (SQLException | ParseException e) {
 
