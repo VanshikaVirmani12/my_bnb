@@ -35,6 +35,7 @@ public class Listing {
   private static int price;
   private static String startDate;
   private static String endDate;
+  private static int wifi, washer, ac, kitchen, dryer;
   private static HashMap<Integer, String> mapListingInfo = new HashMap<>();
   private static String[] room_types = {"Apartment", "House", "Room"};
 
@@ -87,6 +88,23 @@ public class Listing {
     scan.nextLine();
     mapListingInfo.put(10, String.valueOf(price));
 
+    System.out.print("Enter 1 for the amenities that are included in this listing. Enter 0 otherwise\n");
+    System.out.print("Wifi: ");
+    wifi = scan.nextInt();
+    scan.nextLine();
+    System.out.print("Washer: ");
+    washer = scan.nextInt();
+    scan.nextLine();
+    System.out.print("AC: ");
+    ac = scan.nextInt();
+    scan.nextLine();
+    System.out.print("Kitchen: ");
+    kitchen = scan.nextInt();
+    scan.nextLine();
+    System.out.print("Dryer: ");
+    dryer = scan.nextInt();
+    scan.nextLine();
+
     redirectListingOptions();
 
   }
@@ -115,6 +133,48 @@ public class Listing {
             .collect(Collectors.toList());
   }
 
+
+  public static void addAmenities() throws SQLException {
+    st = connection.createStatement();
+
+    String sqlQ;
+    Listing_ID = get_Listing_ID();
+    if (wifi == 1) {
+      sqlQ = "INSERT into Amenities(amenity_ID, amenity_type, listing_ID)" +
+              " values ('1', 'Wifi', '" + Listing_ID + "')\n";
+      System.out.println(sqlQ);
+      st.executeUpdate(sqlQ);
+    }
+
+    if (washer == 1) {
+      sqlQ = "INSERT into Amenities(amenity_ID, amenity_type, listing_ID)" +
+              " values ('2', 'Washer', '" + Listing_ID + "')\n";
+      System.out.println(sqlQ);
+      st.executeUpdate(sqlQ);
+    }
+
+    if (ac == 1) {
+      sqlQ = "INSERT into Amenities(amenity_ID, amenity_type, listing_ID)" +
+              " values ('3', 'AC', '" + Listing_ID + "')\n";
+      System.out.println(sqlQ);
+      st.executeUpdate(sqlQ);
+    }
+    if (kitchen == 1) {
+      sqlQ = "INSERT into Amenities(amenity_ID, amenity_type, listing_ID)" +
+              " values ('4', 'Kitchen', '" + Listing_ID + "')\n";
+      System.out.println(sqlQ);
+      st.executeUpdate(sqlQ);
+    }
+    if (dryer == 1) {
+      sqlQ = "INSERT into Amenities(amenity_ID, amenity_type, listing_ID)" +
+              " values ('5', 'Dryer', '" + Listing_ID + "')\n";
+      System.out.println(sqlQ);
+      st.executeUpdate(sqlQ);
+    }
+
+
+  }
+
   public static void redirectListingOptions() {
 
     try {
@@ -136,6 +196,8 @@ public class Listing {
       stmt1.executeUpdate(insertIntoOwnsTbl);
 
       addAvailability();
+
+      addAmenities();
 
 //      LocalDate start = LocalDate.parse(startDate, formatter);
 //      LocalDate ending = LocalDate.parse(endDate, formatter);
