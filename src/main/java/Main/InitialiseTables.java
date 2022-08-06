@@ -172,7 +172,7 @@ public class InitialiseTables {
       sqlQ = "INSERT INTO Amenities VALUES (?,?,?)\n";
       ps = connection.prepareStatement(sqlQ);
 
-      String[] amenities = {"Wifi", "Kitchen", "Washer", "Dryer", "Air-conditioning"};
+      String[] amenities = {"Wifi", "Kitchen", "Washer", "Dryer", "AC"};
       for (int i=0; i<5; i++){
         ps.setInt(1, (i+1));
         ps.setString(2, amenities[i]);
@@ -276,15 +276,17 @@ public class InitialiseTables {
 
       sqlQ = "create table owns(\n" +
               "\tSIN integer,\n" +
-              "\tlisting_ID integer NOT NULL AUTO_INCREMENT,\n" +
+              "\tlisting_ID integer NOT NULL,\n" +
               "\tprimary key(listing_ID, SIN), index(listing_ID), index(SIN),\n" +
               "\tFOREIGN KEY (SIN) REFERENCES User(SIN),\n" +
               "\tFOREIGN KEY (listing_ID) REFERENCES Listings(listing_ID))\n";
 
       sql.executeUpdate(sqlQ);
 
-//      sqlQ = "INSERT INTO owns VALUES (\n) ";
-//      System.out.println("Prepared Statement: " + sqlQ.replaceAll("\\s+", " ") + "\n");
+      sqlQ = "INSERT INTO owns(SIN, listing_ID) VALUES (0, 1), (0, 2)";
+      //System.out.println("Prepared Statement: " + sqlQ.replaceAll("\\s+", " ") + "\n");
+      sql.executeUpdate(sqlQ);
+
 //      ps = connection.prepareStatement(sqlQ);
 //
 //      for (int i=0; i<2; i++){
@@ -361,18 +363,20 @@ public class InitialiseTables {
       ps.close();
 
       sqlQ = "create table Bookings(\n" +
+              "\tbooking_ID INT NOT NULL AUTO_INCREMENT,\n" +
               "\tlisting_ID integer,\n" +
               "\trenter_ID integer,\n" +
-              "\tdate Date,\n" +
-              "\tprimary key(listing_ID, renter_ID, date))\n";
+              "\tstart Date,\n" +
+              "\tend Date,\n" +
+              "\tcompleted integer,\n" +
+              "\tprimary key(booking_ID))\n";
 
       sql.executeUpdate(sqlQ);
 
-      sqlQ = "INSERT INTO Bookings (listing_ID, renter_ID, date) VALUES (1000, 10, '2022-01-01'),\n" +
-              "(11, 10, '2022-01-02')\n";
+      sqlQ = "INSERT INTO Bookings (listing_ID, renter_ID, start, end, completed) VALUES (1, 2, '2022-01-01','2022-01-03', 1),\n" +
+              "(2, 2, '2022-01-04', '2022-01-05', 0)\n";
 
       sql.executeUpdate(sqlQ);
-
 
 
     } catch (SQLException | ParseException e) {

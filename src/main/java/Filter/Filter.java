@@ -306,21 +306,12 @@ public class Filter {
     LocalDate EndDate = LocalDate.parse(end_date, formatter);
     List<LocalDate> dates = getDatesBetween(StartDate, EndDate);
 
-    int length = dates.size();
-
-    String q = "INSERT INTO Bookings VALUES(?, ?, ?)\n";
     int renter_id = User.LoginPage.getSIN();
-    ps = connection.prepareStatement(q);
+    String q = "INSERT INTO Bookings(listing_ID, renter_ID, start, end, completed) VALUES (" +
+            id + ", " + renter_id + ", '" + start_date + "', '" + end_date + "', 0)\n";
+    System.out.println(q);
+    sql.executeUpdate(q);
 
-    for (int i = 0; i < length; i++){
-
-      Date d = Date.valueOf(dates.get(i));
-      ps.setInt(1, id);
-      ps.setInt(2, renter_id);
-      ps.setDate(3, d);
-      ps.executeUpdate();
-    }
-    ps.close();
   }
 
   //------------------------------------------RESETTING GLOBAL VARIABLES--------------------------------------------

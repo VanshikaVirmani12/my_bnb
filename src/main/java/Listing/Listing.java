@@ -439,7 +439,68 @@ public class Listing {
 
   }
 
-  public static void viewYourListings() throws SQLException, InterruptedException {
+  public static void viewBookings() throws SQLException {
+    System.out.print("Here are all the bookings for all your listings\n");
+
+    st = connection.createStatement();
+    int SIN = User.LoginPage.getSIN();
+    String sqlQ;
+    // for each listing_id you own, what are the bookings associated with it?
+
+    sqlQ = "SELECT b.booking_ID, b.listing_ID, b.renter_ID, b.start, b.end, b.completed\n" +
+            "FROM Bookings b JOIN owns o ON b.listing_ID = o.listing_ID\n" +
+            "WHERE SIN=" + SIN + "\n";
+    System.out.println(sqlQ);
+    ResultSet rs = st.executeQuery(sqlQ);
+
+    Date start, end;
+    String c = "No";
+    int listing_ID, renter_ID, completed, booking_ID;
+
+    while (rs.next()) {
+      booking_ID = rs.getInt("booking_ID");
+      listing_ID = rs.getInt("listing_ID");
+      renter_ID = rs.getInt("renter_ID");
+      start = rs.getDate("start");
+      end = rs.getDate("end");
+      completed = rs.getInt("completed");
+      if (completed == 1) {
+        c = "Yes";
+      } else {
+        c = "No";
+      }
+      System.out.println("Booking ID = " + booking_ID);
+      System.out.println("Listing ID = " + listing_ID);
+      System.out.println("Renter ID = " + renter_ID);
+      System.out.println("Start date of Booking = " + start);
+      System.out.println("End date of Booking = " + end);
+      System.out.println("Booking completed = " + c);
+      System.out.println("------------------------------------\n");
+
+    }
+  }
+
+  public static void cancelBooking() throws SQLException {
+    System.out.print("Enter the Booking Id of the booking that you would like to cancel\n");
+    Listing_ID = scan.nextInt();
+
+    st = connection.createStatement();
+    int SIN = User.LoginPage.getSIN();
+    String sqlQ;
+
+    // for each listing_id you own, what are the bookings associated with it that have already been completed?
+
+    sqlQ = "SELECT b.listing_ID, b.renter_ID, b.start, b.end, b.completed\n" +
+            "FROM Bookings b JOIN owns o ON b.listing_ID = o.listing_ID\n" +
+            "WHERE SIN=" + SIN + " AND completed=1\n";
+    System.out.println(sqlQ);
+    ResultSet rs = st.executeQuery(sqlQ);
+
+
+
+  }
+
+    public static void viewYourListings() throws SQLException, InterruptedException {
     System.out.print("Here are all the listings that you own\n");
 
     st = connection.createStatement();
