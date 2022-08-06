@@ -453,6 +453,39 @@ public class Listing {
       System.out.println("Country = " + country);
       System.out.println("Postal code = " + postal);
       System.out.println("-----------------------------------------------\n");
+
+
+      sqlQ = "SELECT * \n" +
+              "FROM Calender\n" +
+              "INNER JOIN Listings ON Listings.listing_ID = Calender.listing_ID " +
+              "WHERE Calender.listing_ID=" + listing_ID + "\n";
+
+      System.out.println(sqlQ);
+      ResultSet result = st.executeQuery(sqlQ);
+
+      String start, end, date;
+      int price;
+
+      start = startDate;
+      date = start;
+      price = result.getInt("price");
+      DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+
+
+      while (date != endDate) {
+        int new_price = result.getInt("price");
+        if (price != new_price) {
+          end = date;
+          System.out.println("Available from = " + start + " to " + end + " for price " + price);
+          start = date;
+          LocalDate starting = LocalDate.parse(start, formatter);
+          starting = starting.plusDays(1);
+          start = dateFormat.format(date);
+        }
+      }
+      end = date;
+      System.out.println("Available from = " + start + " to " + end + " for price " + price);
+
     }
 
   }

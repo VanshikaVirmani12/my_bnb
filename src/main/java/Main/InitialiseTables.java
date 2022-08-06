@@ -35,7 +35,7 @@ public class InitialiseTables {
               "\tcity varchar(15),\n" +
               "\tcountry varchar(15),\n" +
               "\tapt_name varchar(30),\n" +
-              "\tprimary key(listing_ID))\n";
+              "\tprimary key(listing_ID, latitude, longitude))\n";
 
       sql.executeUpdate(sqlQ);
 
@@ -174,7 +174,7 @@ public class InitialiseTables {
 
       String[] amenities = {"Wifi", "Kitchen", "Washer", "Dryer", "Air-conditioning"};
       for (int i=0; i<5; i++){
-        ps.setInt(1, i);
+        ps.setInt(1, (i+1));
         ps.setString(2, amenities[i]);
         ps.setInt(3, listings[i]);
         ps.executeUpdate();
@@ -279,7 +279,7 @@ public class InitialiseTables {
               "\tlisting_ID integer NOT NULL AUTO_INCREMENT,\n" +
               "\tprimary key(listing_ID, SIN),\n" +
               "\tFOREIGN KEY (SIN) REFERENCES User(SIN))\n";
-             // "\tFOREIGN KEY (listing_ID) REFERENCES Listings(listing_ID))\n";
+              "\tFOREIGN KEY (listing_ID) REFERENCES Listings(listing_ID))\n";
 
 
       sql.executeUpdate(sqlQ);
