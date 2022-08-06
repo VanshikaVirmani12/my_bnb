@@ -49,7 +49,7 @@ public class Filter {
   private static ResultSet rs;
   static PreparedStatement ps;
   static Statement sql;
-  static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY-MM-DD");
+  private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
   // List that will contain filtered listing_ids
   static Set<Integer> LISTING_SET = new HashSet<Integer> ();
@@ -113,9 +113,9 @@ public class Filter {
 
   public static void get_budget(){
     System.out.println("Please type in the budget:");
-    System.out.print("Start Price (YYYY-MM-DD): ");
+    System.out.print("Start Price: ");
     low_price = scan.nextInt();
-    System.out.print("End Price (YYYY-MM-DD): ");
+    System.out.print("End Price: ");
     high_price = scan.nextInt();
     updated_prices = 1;
   }
@@ -195,9 +195,7 @@ public class Filter {
       LISTING_SET.retainAll(prices_set);
     }
     if (updated_dates == 1){
-      LocalDate StartDate = LocalDate.parse(start_date, formatter);
-      LocalDate EndDate = LocalDate.parse(end_date, formatter);
-      set_dates(StartDate,EndDate);
+      set_dates();
       LISTING_SET.retainAll(dates_set);
     }
     if(updated_address == 1) {
@@ -205,7 +203,7 @@ public class Filter {
       LISTING_SET.retainAll(address_set);
     }
     // Now LISTING_SET has the filtered listing ids.
-
+    reset_global_variables();
     print_listings();
   }
 
@@ -346,11 +344,19 @@ public class Filter {
     }
   }
 
-  public static void set_dates(LocalDate start_date, LocalDate end_date) throws SQLException {
-    sqlQ = "SELECT * from Calender\n";
-
-    System.out.println("Executing this filter_by_date_range: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
+  public static void set_dates() throws SQLException {
+    sqlQ = "SELECT * from Listings\n";
+    System.out.println("Executing this set_dates: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
     rs = sql.executeQuery(sqlQ);
+    int avail;
+    while (rs.next()){
+      int listing = rs.getInt("listing_ID");
+      avail = checkAvailability(listing);
+      if (avail == 1){
+        dates_set.add(listing);
+        System.out.println(listing);
+      }
+    }
   }
 
   public static void set_amenities(int has_ac, int has_dryer, int has_kitchen, int has_washer, int has_wifi) throws SQLException {
@@ -388,15 +394,13 @@ public class Filter {
 
 
   // Checking availability of a date
-  public static Integer checkAvailability(int listing_id) throws SQLException {
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY-MM-DD");
+  public static Integer checkAvailability(int listing) throws SQLException {
     LocalDate start = LocalDate.parse(start_date, formatter);
     LocalDate ending = LocalDate.parse(end_date, formatter);
-    LocalDate end = ending.plusDays(1);
     st = connection.createStatement();
 
     String getAllDateQuery = "SELECT COUNT(*) FROM Calender WHERE date >= " + "'" + start_date + "'" + " AND date <= "
-            + "'" + end_date +  "'" + " AND listing_ID = " + listing_id + "\n";
+            + "'" + end_date +  "'" + " AND listing_ID = " + listing + "\n";
     System.out.println(getAllDateQuery);
     ResultSet rs = st.executeQuery(getAllDateQuery);
 
