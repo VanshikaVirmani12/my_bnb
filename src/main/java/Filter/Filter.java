@@ -196,15 +196,17 @@ public class Filter {
     }
     if (updated_dates == 1){
       set_dates();
+      System.out.println(LISTING_SET);
       LISTING_SET.retainAll(dates_set);
+      System.out.println(LISTING_SET);
     }
     if(updated_address == 1) {
       set_address();
       LISTING_SET.retainAll(address_set);
     }
     // Now LISTING_SET has the filtered listing ids.
-    reset_global_variables();
     print_listings();
+    reset_global_variables();
   }
 
   private static void print_listings() {
@@ -355,6 +357,7 @@ public class Filter {
       if (avail == 1){
         dates_set.add(listing);
         System.out.println(listing);
+        System.out.println(dates_set);
       }
     }
   }
