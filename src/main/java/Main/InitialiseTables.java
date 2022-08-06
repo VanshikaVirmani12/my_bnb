@@ -297,37 +297,6 @@ public class InitialiseTables {
 //      }
 //      ps.close();
 
-      sqlQ = "create table rents(\n" +
-              "\tSIN integer,\n" +
-              "\tlisting_ID integer,\n" +
-              "\tstart_date Date,\n" +
-              "\tend_date Date,\n" +
-              "\tprimary key(SIN, listing_ID),\n" +
-              "\tFOREIGN KEY (SIN) REFERENCES User(SIN))\n";
-              //"\tFOREIGN KEY (listing_ID) REFERENCES Listings(listing_ID))\n";
-
-      sql.executeUpdate(sqlQ);
-
-      Integer[] rents_from = {0, 1, 0, 1, 1};
-      String[] start_dates = {"2022-01-01", "2022-01-02", "2022-01-03", "2022-01-04", "2022-01-05"};
-      String[] end_dates = {"2022-01-02", "2022-01-04", "2022-01-05", "2022-01-05", "2022-01-09"};
-
-      sqlQ = "INSERT INTO rents VALUES (?,?,?,?\n) ";
-      ps = connection.prepareStatement(sqlQ);
-
-      for (int i=2; i<5; i++){
-        ps.setInt(1, (i*2));
-        ps.setInt(2, rents_from[i]);
-        Date my_start_date = formatter.parse(start_dates[i]);
-        java.sql.Date sqlDate = new java.sql.Date(my_start_date.getTime());
-        ps.setDate(3, sqlDate);
-        Date my_end_date = formatter.parse(end_dates[i]);
-        sqlDate = new java.sql.Date(my_end_date.getTime());
-        ps.setDate(4, sqlDate);
-        ps.executeUpdate();
-      }
-      ps.close();
-
       // review(comment, rating, rev_id, listing_id, host_id, renter_id)
       sqlQ = "create table Review(\n" +
               "\treview_ID integer,\n" +
@@ -377,6 +346,41 @@ public class InitialiseTables {
               "(2, 2, '2022-01-04', '2022-01-05', 0)\n";
 
       sql.executeUpdate(sqlQ);
+
+      sqlQ = "create table rents(\n" +
+              "\tSIN integer,\n" +
+              "\tbooking_ID INT AUTO_INCREMENT,\n" +
+              "\tlisting_ID integer,\n" +
+              "\tprimary key(booking_ID, listing_ID, SIN), index(booking_ID), index(listing_ID), index(SIN),\n" +
+              "\tFOREIGN KEY (SIN) REFERENCES User(SIN),\n" +
+              "\tFOREIGN KEY (listing_ID) REFERENCES Listings(listing_ID),\n" +
+              "\tFOREIGN KEY (booking_ID) REFERENCES Bookings(booking_ID))\n";
+
+      sql.executeUpdate(sqlQ);
+
+      sqlQ = "INSERT INTO rents (SIN, listing_ID) VALUES (2, 1), (2, 2)\n";
+      sql.executeUpdate(sqlQ);
+
+//      Integer[] rents_from = {0, 1, 0, 1, 1};
+//      String[] start_dates = {"2022-01-01", "2022-01-02", "2022-01-03", "2022-01-04", "2022-01-05"};
+//      String[] end_dates = {"2022-01-02", "2022-01-04", "2022-01-05", "2022-01-05", "2022-01-09"};
+//
+//      sqlQ = "INSERT INTO rents VALUES (?,?,?,?\n) ";
+//      ps = connection.prepareStatement(sqlQ);
+//
+//      for (int i=2; i<5; i++){
+//        ps.setInt(1, (i*2));
+//        ps.setInt(2, rents_from[i]);
+//        Date my_start_date = formatter.parse(start_dates[i]);
+//        java.sql.Date sqlDate = new java.sql.Date(my_start_date.getTime());
+//        ps.setDate(3, sqlDate);
+//        Date my_end_date = formatter.parse(end_dates[i]);
+//        sqlDate = new java.sql.Date(my_end_date.getTime());
+//        ps.setDate(4, sqlDate);
+//        ps.executeUpdate();
+//      }
+//      ps.close();
+
 
 
     } catch (SQLException | ParseException e) {
