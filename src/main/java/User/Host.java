@@ -26,8 +26,9 @@ public class Host {
     System.out.println("4. Cancel a Booking");
     System.out.println("5. Remove a Listing");
     System.out.println("6. Review a Renter");
+    System.out.println("7. Delete your Account");
 
-    System.out.println("7. Exit");
+    System.out.println("8. Exit");
 
     try {
       System.out.print("\nInput: ");
@@ -48,11 +49,14 @@ public class Host {
     if(selectedOption == 1) {
       Listing.createNewListing();
     }else if(selectedOption == 2) {
-     // User.NewRegistration.createNewUserAccount();
+      Listing.viewYourListings();
     }else if(selectedOption == 3){
       System.out.println("Updating Listing");
       Listing.updateListing();
-    } else {
+    } else if(selectedOption == 5){
+      System.out.println("Delete a Listing");
+      Listing.removeListing();
+    }else {
       System.out.println("Invalid input... Try again!!!");
       System.out.println("Redirecting to LogIn page menu....");
       try{Thread.sleep(1000);

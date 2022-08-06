@@ -46,6 +46,7 @@ public class Listing {
     newListingScreenBanner();
     System.out.print("Specify the type of Listing. Enter 1 for Apartment, 2 for House, 3 for Rooms\n");
     type = scan.nextInt();
+    scan.nextLine();
     room_type = room_types[type - 1];
     mapListingInfo.put(1, room_type);
 
@@ -197,7 +198,7 @@ public class Listing {
       System.out.print("Updated Price: ");
       price = scan.nextInt();
       scan.nextLine();
-     // checkAvailability();
+      // checkAvailability();
       if (checkAvailability() == 1) {
         updatePrice();
       } else {
@@ -244,14 +245,12 @@ public class Listing {
         System.out.print("Given Dates are already available. Please try again\n");
         Thread.sleep(500);
         changeAvailability();
-      }
-      else if (checkAvailability() == 0) {
+      } else if (checkAvailability() == 0) {
         System.out.print("Some of the given dates are already available. But some of them are not. " +
                 "Please specify the range of datees are not already available.\n");
         Thread.sleep(500);
         changeAvailability();
-      }
-      else {
+      } else {
         addAvailability();
       }
 
@@ -282,14 +281,14 @@ public class Listing {
 
     String sqlQ;
     sqlQ = "DELETE FROM Calender WHERE date >= " + "'" + startDate + "'" + " AND date <= "
-            + "'" + endDate +  "'" + " AND listing_ID = " + Listing_ID + "\n";
+            + "'" + endDate + "'" + " AND listing_ID = " + Listing_ID + "\n";
 
     System.out.println(sqlQ);
     st.executeUpdate(sqlQ);
 
   }
 
-    public static void addAvailability() throws SQLException {
+  public static void addAvailability() throws SQLException {
 
     LocalDate start = LocalDate.parse(startDate, formatter);
     LocalDate ending = LocalDate.parse(endDate, formatter);
@@ -314,7 +313,7 @@ public class Listing {
 
   }
 
-    public static Integer checkAvailability() throws SQLException {
+  public static Integer checkAvailability() throws SQLException {
 
     LocalDate start = LocalDate.parse(startDate, formatter);
     LocalDate ending = LocalDate.parse(endDate, formatter);
@@ -322,20 +321,21 @@ public class Listing {
     st = connection.createStatement();
 
     String getAllDateQuery = "SELECT COUNT(*) FROM Calender WHERE date >= " + "'" + startDate + "'" + " AND date <= "
-            + "'" + endDate +  "'" + " AND listing_ID = " + Listing_ID + "\n";
+            + "'" + endDate + "'" + " AND listing_ID = " + Listing_ID + "\n";
     System.out.println(getAllDateQuery);
     ResultSet rs = st.executeQuery(getAllDateQuery);
 
     int count = 0;
-    while(rs.next()) {
+    while (rs.next()) {
       count = rs.getInt("COUNT(*)");
     }
     long noOfDaysBetween = ChronoUnit.DAYS.between(start, ending);
     noOfDaysBetween = noOfDaysBetween + 1;
 
-    if (count == noOfDaysBetween ){
+    if (count == noOfDaysBetween) {
       return 1;
-    } if (count == 0 ) {
+    }
+    if (count == 0) {
       return 2;
     } else {
       return 0;
@@ -354,9 +354,81 @@ public class Listing {
 
     String updatePriceQuery = "UPDATE Calender SET price = " +
             price + " WHERE date >= " + "'" + startDate + "'" + " AND date <= "
-            + "'" + endDate +  "'" + " AND listing_ID = " + Listing_ID + "\n";
+            + "'" + endDate + "'" + " AND listing_ID = " + Listing_ID + "\n";
     System.out.println(updatePriceQuery);
     st.executeUpdate(updatePriceQuery);
+
+  }
+
+  public static void viewYourListings() throws SQLException {
+    System.out.print("Here are all the listings that you own\n");
+
+    st = connection.createStatement();
+    int SIN = User.LoginPage.getSIN();
+
+    String sqlQ;
+    sqlQ = "SELECT * \n" +
+            "FROM Listings\n" +
+            "INNER JOIN owns ON Listings.listing_ID=owns.listing_ID\n" +
+            "WHERE owns.SIN = " + SIN + "\n";
+    System.out.println(sqlQ);
+    ResultSet rs = st.executeQuery(sqlQ);
+    String room, postal, city, country, apt;
+    int listing_ID;
+
+    while (rs.next()) {
+      listing_ID = rs.getInt("listing_ID");
+      room = rs.getString("room_type");
+      apt = rs.getString("apt_name");
+      city = rs.getString("city");
+      country = rs.getString("country");
+      postal = rs.getString("postal_code");
+
+      System.out.println("Listing ID = " + listing_ID);
+      System.out.println("Room type = " + room);
+      System.out.println("Apartment name/Road = " + apt);
+      System.out.println("City = " + city);
+      System.out.println("Country = " + country);
+      System.out.println("Postal code = " + postal);
+      System.out.println("-----------------------------------------------\n");
+    }
+
+  }
+
+
+    public static void removeListing() throws SQLException {
+    System.out.print("Specify the Listing ID of the listing that you want to delete. CAUTION: This listing" +
+            "and all information related to this listing will be permanently deleted\n");
+    Listing_ID = scan.nextInt();
+
+    st = connection.createStatement();
+
+    String sqlQ;
+
+    sqlQ = "DELETE FROM Calender WHERE listing_ID = " + Listing_ID + "\n";
+    System.out.println(sqlQ);
+    st.executeUpdate(sqlQ);
+
+    sqlQ = "DELETE FROM Amenities WHERE listing_ID = " + Listing_ID + "\n";
+    System.out.println(sqlQ);
+    st.executeUpdate(sqlQ);
+
+    sqlQ = "DELETE FROM owns WHERE listing_ID = " + Listing_ID + "\n";
+    System.out.println(sqlQ);
+    st.executeUpdate(sqlQ);
+
+    sqlQ = "DELETE FROM Listings WHERE listing_ID = " + Listing_ID + "\n";
+    System.out.println(sqlQ);
+    st.executeUpdate(sqlQ);
+
+    // **** CHECK WHETHER THERE IS A BOOKING AVAILABLE FOR THAT LISTING. DELETE ONLY IF THERE IS NO BOOKING
+    sqlQ = "DELETE FROM rents WHERE listing_ID = " + Listing_ID + "\n";
+    System.out.println(sqlQ);
+    st.executeUpdate(sqlQ);
+
+    sqlQ = "DELETE FROM Review WHERE listing_ID = " + Listing_ID + "\n";
+    System.out.println(sqlQ);
+    st.executeUpdate(sqlQ);
 
   }
 

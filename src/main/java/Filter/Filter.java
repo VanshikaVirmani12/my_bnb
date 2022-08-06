@@ -117,9 +117,9 @@ public class Filter {
 
   public static void get_budget(){
     System.out.println("Please type in the budget:");
-    System.out.print("Start Price: ");
+    System.out.print("Start Price (YYYY-MM-DD): ");
     low_price = scan.nextInt();
-    System.out.print("End Price: ");
+    System.out.print("End Price (YYYY-MM-DD): ");
     high_price = scan.nextInt();
     updated_prices = 1;
   }
