@@ -55,7 +55,7 @@ public class Host {
       Listing.updateListing();
     }else if(selectedOption == 4){
       System.out.println("Cancel a Booking");
-      Listing.viewBookings();
+      Listing.cancelBooking();
     } else if(selectedOption == 5){
       System.out.println("Delete a Listing");
       Listing.removeListing();

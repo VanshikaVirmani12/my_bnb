@@ -20,6 +20,7 @@ import User.Host;
 
 public class Listing {
   private static int Listing_ID = 0;
+  private static int Booking_ID;
   private static Connection connection = ConnectionEstablish.ConnectToJDBC.getMySqlConnection();
   private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -480,24 +481,40 @@ public class Listing {
     }
   }
 
-  public static void cancelBooking() throws SQLException {
+  public static void cancelBooking() throws SQLException, InterruptedException {
+    viewBookings();
     System.out.print("Enter the Booking Id of the booking that you would like to cancel\n");
-    Listing_ID = scan.nextInt();
+    Booking_ID = scan.nextInt();
 
     st = connection.createStatement();
     int SIN = User.LoginPage.getSIN();
     String sqlQ;
 
     // for each listing_id you own, what are the bookings associated with it that have already been completed?
-
-    sqlQ = "SELECT b.listing_ID, b.renter_ID, b.start, b.end, b.completed\n" +
-            "FROM Bookings b JOIN owns o ON b.listing_ID = o.listing_ID\n" +
-            "WHERE SIN=" + SIN + " AND completed=1\n";
+    //delete b from bookings b join owns o on b.listing_ID=o.listing_ID where b.listing_ID=1;
+    sqlQ = "SELECT b FROM Bookings b JOIN owns o ON b.listing_ID=o.listing_ID WHERE b.booking_ID = " + Booking_ID + "\n";
     System.out.println(sqlQ);
     ResultSet rs = st.executeQuery(sqlQ);
 
+    Date start = null, end = null;
 
+    while(rs.next()) {
+      start = rs.getDate("start");
+      end = rs.getDate("end");
+    }
 
+    sqlQ = "DELETE b FROM Bookings b JOIN owns o ON b.listing_ID=o.listing_ID WHERE b.listing_ID = " + Listing_ID + "\n";
+    System.out.println(sqlQ);
+    st.executeUpdate(sqlQ);
+
+    System.out.println("This booking has been cancelled\n");
+    DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+
+    startDate = dateFormat.format(start);
+    endDate = dateFormat.format(end);
+    addAvailability();
+
+    Host.startPage();
   }
 
     public static void viewYourListings() throws SQLException, InterruptedException {
