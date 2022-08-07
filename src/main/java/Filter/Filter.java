@@ -541,7 +541,7 @@ public class Filter {
   }
 
   public static void viewBookings() throws SQLException {
-    System.out.print("Here are all the bookings that you have made\n");
+    System.out.print("Here are all the bookings that you have made in the past as well as the future\n");
 
     st = connection.createStatement();
     int SIN = User.LoginPage.getSIN();
@@ -625,6 +625,80 @@ public class Filter {
     Listing.Listing_ID = id;
     Listing.price = 50;
     Listing.addAvailability();
+
+  }
+
+  public static void viewFilteredListings() throws SQLException, InterruptedException {
+    System.out.print("Here are all the listings that you own\n");
+
+    st = connection.createStatement();
+    int SIN = User.LoginPage.getSIN();
+
+    String sqlQ;
+    sqlQ = "SELECT * \n" +
+            "FROM Listings\n" +
+            "INNER JOIN owns ON Listings.listing_ID=owns.listing_ID\n" +
+            "WHERE owns.SIN = " + SIN + "\n";
+    System.out.println(sqlQ);
+    ResultSet rs = st.executeQuery(sqlQ);
+    String room, postal, city, country, apt;
+    int listing_ID;
+
+    while (rs.next()) {
+      listing_ID = rs.getInt("listing_ID");
+      room = rs.getString("room_type");
+      apt = rs.getString("apt_name");
+      city = rs.getString("city");
+      country = rs.getString("country");
+      postal = rs.getString("postal_code");
+
+      System.out.println("Listing ID = " + listing_ID);
+      System.out.println("Room type = " + room);
+      System.out.println("Apartment name/Road = " + apt);
+      System.out.println("City = " + city);
+      System.out.println("Country = " + country);
+      System.out.println("Postal code = " + postal);
+
+//      String st1 = "SELECT * \n" +
+//              "FROM Calender\n" +
+//              "INNER JOIN Listings ON Listings.listing_ID = Calender.listing_ID " +
+//              "WHERE Calender.listing_ID=" + listing_ID + "\n";
+//
+//      System.out.println(st1);
+//      ResultSet result = st.executeQuery(st1);
+//
+//      int price;
+//      DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//
+//      result.next();
+//      price = result.getInt("price");
+//
+//      Date start = result.getDate("date");
+//      Date date = start;
+//      Date end = start;
+//
+//      while(result.next()) {
+//        int new_price = result.getInt("price");
+//        date =  result.getDate("date");
+//        if (new_price != price) {
+//          end = date;
+//          String s = dateFormat.format(start);
+//          String e = dateFormat.format(end);
+//          System.out.println("Available from = " + start + " to " + end + " for price " + price);
+//          start.setDate(end.getDate() + 1);
+//          price = new_price;
+//        }
+//      }
+//      end = date;
+//      String s = dateFormat.format(start);
+//      String e = dateFormat.format(end);
+//      System.out.println("Available from = " + start + " to " + end + " for price " + price);
+
+      System.out.println("-----------------------------------------------\n");
+
+    }
+
+    Host.startPage();
 
   }
 

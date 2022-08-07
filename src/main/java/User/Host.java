@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 import Listing.Listing;
+import Review.Review;
 public class Host {
 
   private static Scanner scan = new Scanner(System.in);
@@ -59,7 +60,10 @@ public class Host {
     } else if(selectedOption == 5){
       System.out.println("Delete a Listing");
       Listing.removeListing();
-    }else {
+    }else if(selectedOption == 6){
+      System.out.println("Review a Renter");
+      Review.reviewRenter();
+    } else {
       System.out.println("Invalid input... Try again!!!");
       System.out.println("Redirecting to LogIn page menu....");
       try{Thread.sleep(1000);

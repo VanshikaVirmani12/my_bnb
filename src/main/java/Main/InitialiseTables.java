@@ -299,37 +299,29 @@ public class InitialiseTables {
 
       // review(comment, rating, rev_id, listing_id, host_id, renter_id)
       sqlQ = "create table Review(\n" +
-              "\treview_ID integer,\n" +
-              "\tlisting_ID integer,\n" +
+              "\treview_ID INT NOT NULL AUTO_INCREMENT,\n" +
+              "\tbooking_ID integer,\n" +
               "\thost_ID integer,\n" +
               "\trenter_ID integer,\n" +
               "\tcomment varchar(200),\n" +
               "\trating integer,\n" +
-              "\tprimary key(review_ID))\n";
-             // "\tFOREIGN KEY (host_ID) REFERENCES Host(SIN),\n" +
-             // "\tFOREIGN KEY (renter_ID) REFERENCES Renter(SIN))\n";
-             // "\tFOREIGN KEY (listing_ID) REFERENCES Listings(listing_ID))\n";
+              "\thost_to_renter integer,\n" +
+              "\trenter_to_host integer,\n" +
+              "\trenter_to_listing integer,\n" +
+              "\tprimary key(review_ID), index(booking_ID), index(listing_ID), index(host_ID),  index(renter_ID),\n" +
+              "\tFOREIGN KEY (host_ID) REFERENCES Host(SIN),\n" +
+              "\tFOREIGN KEY (renter_ID) REFERENCES Renter(SIN),\n" +
+              "\tFOREIGN KEY (booking_ID) REFERENCES Bookings(booking_ID))\n";
 
       sql.executeUpdate(sqlQ);
 
-      String[] reviews = {"Amazing view", "Best pool", "Poor service"};
-      Integer[] rating = {5, 4, 2};
-      Integer[] renters = {2, 3, 4};
-      Integer[] hosts = {0, 1, 1};
+      sqlQ = "INSERT INTO Review (booking_ID, host_ID, renter_ID, comment, rating, host_to_renter, " +
+              "renter_to_host, renter_to_listing) VALUES " +
+              "(1, 0, 2,'Amazing view', 4, 0, 0, 1),\n" +
+              "(2, 0, 2,'Good host', 3, 0, 1, 0),\n" +
+              "(1, 0, 2,'Good renter', 4, 1, 0, 0)\n";
 
-      sqlQ = "INSERT INTO Review VALUES (?,?,?,?,?,?\n) ";
-      ps = connection.prepareStatement(sqlQ);
-
-      for (int i=0; i<3; i++){
-        ps.setInt(1, i);
-        ps.setInt(2, i);
-        ps.setInt(3, hosts[i]);
-        ps.setInt(4, renters[i]);
-        ps.setString(5, reviews[i]);
-        ps.setInt(6, rating[i]);
-        ps.executeUpdate();
-      }
-      ps.close();
+      sql.executeUpdate(sqlQ);
 
       sqlQ = "create table Bookings(\n" +
               "\tbooking_ID INT NOT NULL AUTO_INCREMENT,\n" +

@@ -8,7 +8,7 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 import Filter.Filter;
-
+import Review.Review;
 
 public class Renter {
 
@@ -43,8 +43,12 @@ public class Renter {
     System.out.println("6. Filter by Amenities");
     System.out.println("7. Search Listings");
     System.out.println("8. Book a listing");
-    System.out.println("9. Cancel Booking");
-    System.out.println("10. Exit");
+    System.out.println("9. View Bookings");
+    System.out.println("10. Cancel Booking");
+    System.out.println("11. Review a Listing");
+    System.out.println("12. Review a Host");
+    System.out.println("13. Delete your Account");
+    System.out.println("14. Exit");
 
     try {
       System.out.print("\nInput: ");
@@ -62,7 +66,7 @@ public class Renter {
       selectFilter();
     }
 
-    while (selectedOption != 10){
+    while (selectedOption != 14){
       if(selectedOption == 1){
         Filter.get_address();
 
@@ -88,8 +92,20 @@ public class Renter {
         Filter.book_listing();
       }
       else if (selectedOption == 9){
+        System.out.println("View Bookings");
+        Filter.viewBookings();
+      }
+      else if (selectedOption == 10){
         System.out.println("Cancel a Booking");
         Filter.cancelBooking();
+      }
+      else if (selectedOption == 11){
+        System.out.println("Review a Listing");
+        Review.reviewListing();
+      }
+      else if (selectedOption == 12){
+        System.out.println("Review a Host");
+        Review.reviewHost();
       }
       else {
         System.out.println("Input only numbers... Try again!!!");
