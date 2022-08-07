@@ -57,13 +57,13 @@ public class Filter {
   private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
   // List that will contain filtered listing_ids
-  static Set<Integer> LISTING_SET = new HashSet<Integer> ();
-  static Set<Integer> postal_code_set = new HashSet<Integer> ();
-  static Set<Integer> address_set = new HashSet<Integer> ();
-  static Set<Integer> location_set = new HashSet<Integer> ();
-  static Set<Integer> prices_set = new HashSet<Integer> ();
-  static Set<Integer> amenities_set = new HashSet<Integer> ();
-  static Set<Integer> dates_set = new HashSet<Integer> ();
+  static Set<Integer> LISTING_SET = new HashSet<Integer>();
+  static Set<Integer> postal_code_set = new HashSet<Integer>();
+  static Set<Integer> address_set = new HashSet<Integer>();
+  static Set<Integer> location_set = new HashSet<Integer>();
+  static Set<Integer> prices_set = new HashSet<Integer>();
+  static Set<Integer> amenities_set = new HashSet<Integer>();
+  static Set<Integer> dates_set = new HashSet<Integer>();
 
   public Filter() throws SQLException {
     this.city = city;
@@ -94,7 +94,7 @@ public class Filter {
   }
 
   //------------------------------------------GETTING DATA FROM USER--------------------------------------------
-  public static void get_address(){
+  public static void get_address() {
     System.out.println("Please type in the address:");
     System.out.print("Apt Name: ");
     apt_name = scan.next();
@@ -107,7 +107,7 @@ public class Filter {
     updated_address = 1;
   }
 
-  public static void get_dates(){
+  public static void get_dates() {
     System.out.println("Please type in the dates:");
     System.out.print("Start Date: ");
     start_date = scan.next();
@@ -117,7 +117,7 @@ public class Filter {
   }
 
   public static void get_budget() throws SQLException {
-    if (updated_dates == 0){
+    if (updated_dates == 0) {
       System.out.println("Please specify the dates you would want to look for.");
       System.out.print("Start date: ");
       start_date = scan.next();
@@ -125,7 +125,7 @@ public class Filter {
       end_date = scan.next();
       set_dates();
 
-      while(dates_set.isEmpty()) {
+      while (dates_set.isEmpty()) {
         System.out.print("Sorry, the dates entered aren't available. Please enter 1 to change dates or 2 to return to the menu: ");
         int choice = scan.nextInt();
         if (choice == 1) {
@@ -138,7 +138,6 @@ public class Filter {
           return;
         }
       }
-
 
 
 //      if(dates_set.isEmpty()) {
@@ -170,7 +169,7 @@ public class Filter {
     updated_prices = 1;
   }
 
-  public static void get_location(){
+  public static void get_location() {
     System.out.println("Please type in the location:");
     System.out.print("Longitude: ");
     longitude = scan.nextInt();
@@ -178,26 +177,26 @@ public class Filter {
     latitude = scan.nextInt();
     System.out.print("The default distance is 10 km. Enter 1 to change the default or 2 to continue: ");
     int option = scan.nextInt();
-    if (option == 1){
+    if (option == 1) {
       System.out.print("Please enter the distance (in km): ");
       distance = scan.nextInt();
     }
     updated_location = 1;
   }
 
-  public static void get_postal_code(){
+  public static void get_postal_code() {
     System.out.print("Please type in the Postal Code:");
     postal_code = scan.next();
     System.out.print("The default distance is 10 km. Enter 1 to change the default or 2 to continue: ");
     int option = scan.nextInt();
-    if (option == 1){
+    if (option == 1) {
       System.out.print("Please enter the distance (in km): ");
       distance = scan.nextInt();
     }
     updated_postal_code = 1;
   }
 
-  public static void get_amenities(){
+  public static void get_amenities() {
     System.out.println("Please type in the amenities required (0 for no, 1 for yes):");
     System.out.print("Has AC: ");
     has_ac = scan.nextInt();
@@ -215,8 +214,8 @@ public class Filter {
   //------------------------------------------FILTER LISTING--------------------------------------------
   public static void filter_listings() throws SQLException {
     // Display first 20 listings
-    int empty = updated_address+updated_dates+updated_prices+updated_location+updated_amenities+updated_postal_code;
-    if (empty == 0){
+    int empty = updated_address + updated_dates + updated_prices + updated_location + updated_amenities + updated_postal_code;
+    if (empty == 0) {
       System.out.println("No filter applied! here are the first 20 results from listing: ");
       // Display the first 20 listings and return to the filters page
       return;
@@ -228,7 +227,7 @@ public class Filter {
     // Fill the LISTING_ARRAY
     set_listing_array();
 
-    if(updated_postal_code == 1){
+    if (updated_postal_code == 1) {
       //System.out.println("list before: "+ LISTING_SET);
       set_postal_code();
       //System.out.println("set of filtered: "+ postal_code_set);
@@ -237,32 +236,32 @@ public class Filter {
       //sort_by_postal_code();
       //System.out.println("list after sorting: "+ LISTING_SET);
     }
-    if (updated_amenities == 1){
+    if (updated_amenities == 1) {
       //System.out.println(LISTING_SET);
       set_amenities();
       //System.out.println("Amenitites Set: "+ amenities_set);
       LISTING_SET.retainAll(amenities_set);
       //System.out.println("After listing set: "+LISTING_SET);
     }
-    if(updated_location == 1){
+    if (updated_location == 1) {
       //System.out.println("list before: "+ LISTING_SET);
       set_location();
       //System.out.println("set of filtered: "+ location_set);
       LISTING_SET.retainAll(location_set);
       //System.out.println("list after: "+ LISTING_SET);
     }
-    if(updated_prices == 1){
+    if (updated_prices == 1) {
       set_prices();
       LISTING_SET.retainAll(prices_set);
       //sort_by_prices();
     }
-    if (updated_dates == 1){
+    if (updated_dates == 1) {
       set_dates();
       System.out.println(LISTING_SET);
       LISTING_SET.retainAll(dates_set);
       System.out.println(LISTING_SET);
     }
-    if(updated_address == 1) {
+    if (updated_address == 1) {
       set_address();
       LISTING_SET.retainAll(address_set);
     }
@@ -296,7 +295,8 @@ public class Filter {
       rs.next();
       price = rs.getInt("price");
       start = rs.getDate("date");
-      end = start; date = start;
+      end = start;
+      date = start;
 
       listing_ID = rs.getInt("listing_ID");
       room = rs.getString("room_type");
@@ -313,10 +313,10 @@ public class Filter {
       System.out.println("Postal code = " + postal);
 
       int new_price;
-      while(rs.next()){
+      while (rs.next()) {
         end = date;
         new_price = rs.getInt("price");
-        date =  rs.getDate("date");
+        date = rs.getDate("date");
         if (new_price != price) {
           System.out.println("Available from " + start + " to " + end + " for price " + price);
           start.setDate(end.getDate() + 1);
@@ -334,64 +334,64 @@ public class Filter {
 
   private static void print_listings() throws SQLException {
 
-    if(updated_prices == 1 && updated_location == 1 && updated_postal_code == 1){
+    if (updated_prices == 1 && updated_location == 1 && updated_postal_code == 1) {
       System.out.println("Enter 1 to see the filtering ordered by prices, 2 ordered by location and 3 ordered by postal code: ");
       int choice = scan.nextInt();
-      if (choice == 1){
+      if (choice == 1) {
         updated_prices = 1;
         updated_location = 0;
         updated_postal_code = 0;
-      }else if (choice == 2){
+      } else if (choice == 2) {
         updated_prices = 0;
         updated_location = 1;
         updated_postal_code = 0;
-      }else if (choice == 3){
+      } else if (choice == 3) {
         updated_prices = 0;
         updated_location = 0;
         updated_postal_code = 1;
-      }else {
+      } else {
         System.out.print("Invalid option!");
       }
-    }else if (updated_postal_code == 1 && updated_location == 1){
+    } else if (updated_postal_code == 1 && updated_location == 1) {
       System.out.println("Enter 1 to see the filtering ordered by postal code, 2 ordered by location: ");
       int choice = scan.nextInt();
-      if (choice == 1){
+      if (choice == 1) {
         updated_location = 0;
         updated_postal_code = 1;
-      }else if (choice == 2) {
+      } else if (choice == 2) {
         updated_location = 1;
         updated_postal_code = 0;
-      }else {
+      } else {
         System.out.println("Invalid choice!");
       }
-    }else if (updated_postal_code == 1 && updated_prices == 1){
+    } else if (updated_postal_code == 1 && updated_prices == 1) {
       System.out.println("Enter 1 to see the filtering ordered by prices, 2 ordered by postal code: ");
       int choice = scan.nextInt();
-      if (choice == 1){
+      if (choice == 1) {
         updated_prices = 1;
         updated_postal_code = 0;
-      }else if (choice == 2) {
+      } else if (choice == 2) {
         updated_prices = 0;
         updated_postal_code = 1;
-      }else {
+      } else {
         System.out.println("Invalid choice!");
       }
-    }else if (updated_location == 1 && updated_prices == 1 ){
+    } else if (updated_location == 1 && updated_prices == 1) {
       System.out.println("Enter 1 to see the filtering ordered by prices, 2 ordered by location: ");
       int choice = scan.nextInt();
-      if (choice == 1){
+      if (choice == 1) {
         updated_prices = 1;
         updated_location = 0;
-      }else if (choice == 2) {
+      } else if (choice == 2) {
         updated_prices = 0;
         updated_location = 1;
-      }else {
+      } else {
         System.out.println("Invalid choice!");
       }
     }
 
     // The above code makes sure either one of the 3 is true!
-    if(updated_location ==1){
+    if (updated_location == 1) {
       sort_by_location();
       LISTING_SET.clear();
       for (HashMap.Entry<Integer, Double> entry : location_hashmap.entrySet()) {
@@ -401,14 +401,14 @@ public class Filter {
         //System.out.println("This is the new listing_set: "+ LISTING_SET);
       }
       //System.out.println(location_hashmap);
-    }else if (updated_postal_code == 1){
+    } else if (updated_postal_code == 1) {
       sort_by_postal_code();
       LISTING_SET.clear();
       for (HashMap.Entry<Integer, Integer> entry : postal_code_hashmap.entrySet()) {
         LISTING_SET.add(entry.getKey());
       }
       //System.out.println(postal_code_hashmap);
-    }else if (updated_prices == 1){
+    } else if (updated_prices == 1) {
       sort_by_prices();
       LISTING_SET.clear();
       for (HashMap.Entry<Integer, Integer> entry : prices_hashmap.entrySet()) {
@@ -418,7 +418,7 @@ public class Filter {
     }
 
 
-    System.out.println("THE FILTERED LISTINGS ARE: "+LISTING_SET);
+    System.out.println("THE FILTERED LISTINGS ARE: " + LISTING_SET);
 
     // iterate over the listings in LISTING_SET and print data
 //    ArrayList <Integer> array = new ArrayList<>(); // to make sure that no duplicate listings are displayed
@@ -485,21 +485,21 @@ public class Filter {
   public static void book_listing() throws SQLException, ParseException, InterruptedException {
     System.out.print("Please enter the listing ID for the listing you want to book: ");
     int id = scan.nextInt();
-    if (updated_dates == 0){
+    if (updated_dates == 0) {
       System.out.println("PLease specify the days you want to book for: ");
       System.out.print("Start date: ");
       start_date = scan.next();
       System.out.print("End date: ");
       end_date = scan.next();
       int availability = checkAvailability(id);
-      if (availability != 1){ // what number is when no availability
+      if (availability != 1) { // what number is when no availability
         //reset_global_variables();
         System.out.println("The listing for the chosen dates aren't available :(");
         System.out.println("To enter another set of dates enter 1. To return to filters page, enter 2");
         int choice = scan.nextInt();
-        if (choice == 1){
+        if (choice == 1) {
           book_listing();
-        }else{
+        } else {
           reset_global_variables();
           Renter.selectFilter();
         }
@@ -547,7 +547,7 @@ public class Filter {
     sqlQ = "SELECT * from listings\n";
     //System.out.println("Setting listing_array: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
     rs = sql.executeQuery(sqlQ);
-    while(rs.next()){
+    while (rs.next()) {
       LISTING_SET.add(rs.getInt("Listing_ID"));
     }
   }
@@ -567,51 +567,51 @@ public class Filter {
 //      }
 //    }
     int price;
-    for (int listing_id : LISTING_SET){
-      sqlQ = "SELECT price from Calender where listing_ID = "+ "'" + listing_id +"'" +"\n";
+    for (int listing_id : LISTING_SET) {
+      sqlQ = "SELECT price from Calender where listing_ID = " + "'" + listing_id + "'" + "\n";
       rs = sql.executeQuery(sqlQ);
       int add = 1;
-      while(rs.next()){
+      while (rs.next()) {
         price = rs.getInt("price");
-        if(price > high_price || price < low_price){
+        if (price > high_price || price < low_price) {
           add = 0;
         }
       }
-      if (add == 1){
+      if (add == 1) {
         prices_set.add(listing_id);
       }
     }
   }
 
-  public static void set_location() throws SQLException{
+  public static void set_location() throws SQLException {
     // define a default distance
     // order by distance
     sqlQ = "SELECT * from listings\n";
     //System.out.println("Executing this filter_by_long_lat: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
     rs = sql.executeQuery(sqlQ);
 
-    while (rs.next()){
+    while (rs.next()) {
       double lon = rs.getDouble("longitude");
       double lat = rs.getDouble("latitude");
       double get_distance = get_distance_lon_lat(longitude, latitude, lon, lat);
       //System.out.println("get_distance = "+ get_distance+ " and distance = " +distance);
-      if (get_distance <= distance){
+      if (get_distance <= distance) {
         location_set.add(rs.getInt("Listing_ID"));
       }
     }
   }
 
-  public static void set_postal_code() throws SQLException{
+  public static void set_postal_code() throws SQLException {
     // same or adjacent postal codes
     sqlQ = "SELECT * from listings\n";
     //System.out.println("Executing this filter_by_postal_code: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
     rs = sql.executeQuery(sqlQ);
 
-    while (rs.next()){
+    while (rs.next()) {
       String code = rs.getString("postal_code");
       double get_distance = get_distance_postal_code(code, postal_code);
       //System.out.println("get_distance = "+ get_distance+ " and distance = " +distance);
-      if (get_distance<= distance){
+      if (get_distance <= distance) {
         postal_code_set.add(rs.getInt("Listing_ID"));
       }
     }
@@ -619,11 +619,11 @@ public class Filter {
 
   public static void set_address() throws SQLException {
     sqlQ = "SELECT * from listings\n" +
-            "\tWHERE apt_name LIKE "+ "'"+ apt_name + "'"+" AND city LIKE "+ "'"+city + "'"+ " AND country LIKE "+"'"+ country +"'"+ " AND postal_code LIKE "+"'"+postal_code+"'"+"\n";
+            "\tWHERE apt_name LIKE " + "'" + apt_name + "'" + " AND city LIKE " + "'" + city + "'" + " AND country LIKE " + "'" + country + "'" + " AND postal_code LIKE " + "'" + postal_code + "'" + "\n";
     //System.out.println("Executing this filter_by_address: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
     rs = sql.executeQuery(sqlQ);
 
-    while (rs.next()){
+    while (rs.next()) {
       address_set.add(rs.getInt("Listing_ID"));
     }
   }
@@ -633,11 +633,11 @@ public class Filter {
     //System.out.println("Executing this set_dates: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
     rs = sql.executeQuery(sqlQ);
     int avail;
-    while (rs.next()){
+    while (rs.next()) {
       int listing = rs.getInt("listing_ID");
       avail = checkAvailability(listing);
       //System.out.println("AVAILABILITY FOR LISTING ID = "+listing+ ": "+ avail);
-      if (avail == 1){
+      if (avail == 1) {
         dates_set.add(listing);
         //System.out.println(listing);
         //System.out.println(dates_set);
@@ -647,47 +647,51 @@ public class Filter {
 
   public static void set_amenities() throws SQLException {
     ArrayList<Integer> desired_amen = new ArrayList<Integer>(5);
-    if(has_ac == 1){
+    if (has_ac == 1) {
       desired_amen.add(5);
-    }if (has_dryer == 1){
+    }
+    if (has_dryer == 1) {
       desired_amen.add(4);
-    }if (has_kitchen == 1){
+    }
+    if (has_kitchen == 1) {
       desired_amen.add(2);
-    }if (has_washer ==1){
+    }
+    if (has_washer == 1) {
       desired_amen.add(3);
-    }if (has_wifi == 1){
+    }
+    if (has_wifi == 1) {
       desired_amen.add(1);
     }
     int amen_id;
     ArrayList<Integer> has_amen = new ArrayList<Integer>(5);
-    for (int listing_id : LISTING_SET){
+    for (int listing_id : LISTING_SET) {
       has_amen.clear();
       int satisfies = 1;
-      sqlQ = "Select amenity_ID from amenities where listing_ID = "+"'"+listing_id+"'"+"\n";
+      sqlQ = "Select amenity_ID from amenities where listing_ID = " + "'" + listing_id + "'" + "\n";
       rs = sql.executeQuery(sqlQ);
-      while(rs.next()){
+      while (rs.next()) {
         amen_id = rs.getInt("amenity_ID");
         has_amen.add(amen_id);
-        if(listing_id == 3){
-          System.out.println("Adding amen!!!! : "+amen_id);
+        if (listing_id == 3) {
+          System.out.println("Adding amen!!!! : " + amen_id);
         }
       }
-      for (int amen: desired_amen){
-        if(listing_id == 3){
-          System.out.println("Value of amen: "+amen);
-          System.out.println("Value of has_amen: "+has_amen);
-          System.out.println("Value of bool: "+!has_amen.contains(amen));
+      for (int amen : desired_amen) {
+        if (listing_id == 3) {
+          System.out.println("Value of amen: " + amen);
+          System.out.println("Value of has_amen: " + has_amen);
+          System.out.println("Value of bool: " + !has_amen.contains(amen));
 
         }
-        if(!has_amen.contains(amen)){
+        if (!has_amen.contains(amen)) {
           satisfies = 0;
         }
       }
-      if (satisfies == 1){
+      if (satisfies == 1) {
         amenities_set.add(listing_id);
       }
-      if(listing_id == 3){
-        System.out.println("Value of satisfies: "+satisfies);
+      if (listing_id == 3) {
+        System.out.println("Value of satisfies: " + satisfies);
       }
     }
 
@@ -697,26 +701,26 @@ public class Filter {
   //------------------------------------------HELPER FUNCTIONS--------------------------------------------
 
   // Getting distance between 2 coordinates
-  public static double get_distance_lon_lat(double lon1, double lat1, double lon2, double lat2){
+  public static double get_distance_lon_lat(double lon1, double lat1, double lon2, double lat2) {
 
     double dlon = Math.toRadians(lon2) - Math.toRadians(lon1);
     double dlat = Math.toRadians(lat2) - Math.toRadians(lat1);
     double a = Math.pow(Math.sin(dlat / 2), 2)
             + Math.cos(lat1) * Math.cos(lat2)
-            * Math.pow(Math.sin(dlon / 2),2);
+            * Math.pow(Math.sin(dlon / 2), 2);
     double c = 2 * Math.asin(Math.sqrt(a));
     double r = 6371;
-    return c*r;
+    return c * r;
 
   }
 
   // Getting distance between 2 postal codes
-  public static int get_distance_postal_code(String postal_code1, String postal_code2){
+  public static int get_distance_postal_code(String postal_code1, String postal_code2) {
     int num1 = postal_code1.hashCode();
     int num2 = postal_code2.hashCode();
     //System.out.print(num1);
     //System.out.println(", "+ num2);
-    return  Math.abs(num2 - num1);
+    return Math.abs(num2 - num1);
   }
 
 
@@ -727,20 +731,21 @@ public class Filter {
     st = connection.createStatement();
 
     String getAllDateQuery = "SELECT COUNT(*) FROM Calender WHERE date >= " + "'" + start_date + "'" + " AND date <= "
-            + "'" + end_date +  "'" + " AND listing_ID = " + listing + "\n";
+            + "'" + end_date + "'" + " AND listing_ID = " + listing + "\n";
     //System.out.println(getAllDateQuery);
     ResultSet rs = st.executeQuery(getAllDateQuery);
 
     int count = 0;
-    while(rs.next()) {
+    while (rs.next()) {
       count = rs.getInt("COUNT(*)");
     }
     long noOfDaysBetween = ChronoUnit.DAYS.between(start, ending);
     noOfDaysBetween = noOfDaysBetween + 1;
 
-    if (count == noOfDaysBetween ){
+    if (count == noOfDaysBetween) {
       return 1; // on success
-    } if (count == 0 ) {
+    }
+    if (count == 0) {
       return 2;
     } else {
       return 0;
@@ -783,12 +788,12 @@ public class Filter {
 
   public static void sort_by_location() throws SQLException {
     // key is listing and value is distance
-    for (int listing_id : LISTING_SET){
-      sqlQ = "select * from listings where listing_ID =" + "'"+listing_id+"'"+"\n";
+    for (int listing_id : LISTING_SET) {
+      sqlQ = "select * from listings where listing_ID =" + "'" + listing_id + "'" + "\n";
       //System.out.println("Executing this sort_by_location: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
       rs = sql.executeQuery(sqlQ);
       int lon, lat;
-      while(rs.next()) {
+      while (rs.next()) {
         lon = rs.getInt("longitude");
         lat = rs.getInt("latitude");
         double dis = get_distance_lon_lat(lon, lat, longitude, latitude);
@@ -801,12 +806,12 @@ public class Filter {
 
   public static void sort_by_postal_code() throws SQLException {
     // key is listing and value is distance
-    for (int listing_id : LISTING_SET){
-      sqlQ = "select * from listings where listing_ID =" + "'"+listing_id+"'"+"\n";
+    for (int listing_id : LISTING_SET) {
+      sqlQ = "select * from listings where listing_ID =" + "'" + listing_id + "'" + "\n";
       //System.out.println("Executing this sort_by_postal_code: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
       rs = sql.executeQuery(sqlQ);
       String post;
-      while(rs.next()) {
+      while (rs.next()) {
         post = rs.getString("postal_code");
         int dis = get_distance_postal_code(post, postal_code);
         postal_code_hashmap.put(listing_id, dis);
@@ -818,18 +823,18 @@ public class Filter {
   }
 
   public static void sort_by_prices() throws SQLException {
-    for (int listing_id : LISTING_SET){
-      sqlQ = "select * from calender where listing_ID =" + "'"+listing_id+"'"+"\n";
+    for (int listing_id : LISTING_SET) {
+      sqlQ = "select * from calender where listing_ID =" + "'" + listing_id + "'" + "\n";
       //System.out.println("Executing this sort_by_postal_code: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
       rs = sql.executeQuery(sqlQ);
       int pri;
       List<Integer> price_arr = new ArrayList<Integer>();
-      while(rs.next()) {
+      while (rs.next()) {
         pri = rs.getInt("price");
         price_arr.add(pri);
         //System.out.println("THIS IS THE Price FOR prices: "+pri);
       }
-      if (!price_arr.isEmpty()){
+      if (!price_arr.isEmpty()) {
         pri = Collections.max(price_arr);
         prices_hashmap.put(listing_id, pri);
       }
@@ -839,7 +844,7 @@ public class Filter {
   }
 
 
-  public static HashMap<Integer, Double> sortByValue_double(HashMap<Integer, Double> hm){
+  public static HashMap<Integer, Double> sortByValue_double(HashMap<Integer, Double> hm) {
     List<Map.Entry<Integer, Double>> list = new LinkedList<Map.Entry<Integer, Double>>(hm.entrySet());
 
     // Sorting the list
@@ -852,13 +857,13 @@ public class Filter {
 
     // put data from sorted list to hashmap
     HashMap<Integer, Double> temp = new LinkedHashMap<Integer, Double>();
-    for (Map.Entry<Integer, Double> aa : list){
+    for (Map.Entry<Integer, Double> aa : list) {
       temp.put(aa.getKey(), aa.getValue());
     }
     return temp;
   }
 
-  public static HashMap<Integer, Integer> sortByValue_integer(HashMap<Integer, Integer> hm){
+  public static HashMap<Integer, Integer> sortByValue_integer(HashMap<Integer, Integer> hm) {
     List<Map.Entry<Integer, Integer>> list = new LinkedList<Map.Entry<Integer, Integer>>(hm.entrySet());
 
     // Sorting the list
@@ -871,7 +876,7 @@ public class Filter {
 
     // put data from sorted list to hashmap
     HashMap<Integer, Integer> temp = new LinkedHashMap<Integer, Integer>();
-    for (Map.Entry<Integer, Integer> aa : list){
+    for (Map.Entry<Integer, Integer> aa : list) {
       temp.put(aa.getKey(), aa.getValue());
     }
     return temp;
@@ -937,7 +942,7 @@ public class Filter {
 
     Date start = null, end = null;
     int id = 0;
-    while(rs.next()) {
+    while (rs.next()) {
       start = rs.getDate("start");
       end = rs.getDate("end");
       id = rs.getInt("listing_ID");
@@ -966,79 +971,7 @@ public class Filter {
 
   }
 
-  public static void viewFilteredListings() throws SQLException, InterruptedException {
-    System.out.print("Here are all the listings that you own\n");
-
-    st = connection.createStatement();
-    int SIN = User.LoginPage.getSIN();
-
-    String sqlQ;
-    sqlQ = "SELECT * \n" +
-            "FROM Listings\n" +
-            "INNER JOIN owns ON Listings.listing_ID=owns.listing_ID\n" +
-            "WHERE owns.SIN = " + SIN + "\n";
-    System.out.println(sqlQ);
-    ResultSet rs = st.executeQuery(sqlQ);
-    String room, postal, city, country, apt;
-    int listing_ID;
-
-    while (rs.next()) {
-      listing_ID = rs.getInt("listing_ID");
-      room = rs.getString("room_type");
-      apt = rs.getString("apt_name");
-      city = rs.getString("city");
-      country = rs.getString("country");
-      postal = rs.getString("postal_code");
-
-      System.out.println("Listing ID = " + listing_ID);
-      System.out.println("Room type = " + room);
-      System.out.println("Apartment name/Road = " + apt);
-      System.out.println("City = " + city);
-      System.out.println("Country = " + country);
-      System.out.println("Postal code = " + postal);
-
-//      String st1 = "SELECT * \n" +
-//              "FROM Calender\n" +
-//              "INNER JOIN Listings ON Listings.listing_ID = Calender.listing_ID " +
-//              "WHERE Calender.listing_ID=" + listing_ID + "\n";
-//
-//      System.out.println(st1);
-//      ResultSet result = st.executeQuery(st1);
-//
-//      int price;
-//      DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-//
-//      result.next();
-//      price = result.getInt("price");
-//
-//      Date start = result.getDate("date");
-//      Date date = start;
-//      Date end = start;
-//
-//      while(result.next()) {
-//        int new_price = result.getInt("price");
-//        date =  result.getDate("date");
-//        if (new_price != price) {
-//          end = date;
-//          String s = dateFormat.format(start);
-//          String e = dateFormat.format(end);
-//          System.out.println("Available from = " + start + " to " + end + " for price " + price);
-//          start.setDate(end.getDate() + 1);
-//          price = new_price;
-//        }
-//      }
-//      end = date;
-//      String s = dateFormat.format(start);
-//      String e = dateFormat.format(end);
-//      System.out.println("Available from = " + start + " to " + end + " for price " + price);
-
-      System.out.println("-----------------------------------------------\n");
-
-    }
-
-    Host.startPage();
-
-  }
+  
 
 
 }

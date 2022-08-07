@@ -109,6 +109,10 @@ public class Renter {
         System.out.println("Review a Host");
         Review.reviewHost();
       }
+      else if (selectedOption == 13){
+        System.out.println("Delete your Account");
+        Filter.deleteRenter();
+      }
       else {
         System.out.println("Input only numbers... Try again!!!");
         System.out.println("Redirecting to Filter.Filter page menu...");
