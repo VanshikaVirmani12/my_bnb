@@ -70,6 +70,5 @@ public class Host {
       } catch (InterruptedException e) { e.printStackTrace();}
     }
 
-
   }
 }

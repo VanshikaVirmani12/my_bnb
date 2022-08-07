@@ -212,7 +212,7 @@ public class Filter {
   }
 
   //------------------------------------------FILTER LISTING--------------------------------------------
-  public static void filter_listings() throws SQLException {
+  public static void filter_listings() throws SQLException, InterruptedException {
     // Display first 20 listings
     int empty = updated_address + updated_dates + updated_prices + updated_location + updated_amenities + updated_postal_code;
     if (empty == 0) {
@@ -271,7 +271,7 @@ public class Filter {
     reset_global_variables();
   }
 
-  public static void displayListingsRenter() throws SQLException {
+  public static void displayListingsRenter() throws SQLException, InterruptedException {
     System.out.print("Here are all the listings available after the filtering\n");
 
     st = connection.createStatement();
@@ -311,6 +311,8 @@ public class Filter {
       System.out.println("City = " + city);
       System.out.println("Country = " + country);
       System.out.println("Postal code = " + postal);
+
+      displayAmenities();
 
       int new_price;
       while (rs.next()) {
@@ -971,7 +973,23 @@ public class Filter {
 
   }
 
-  
+    public static void displayAmenities() throws SQLException, InterruptedException {
+      List<String> amenities = new ArrayList<>();
+      st = connection.createStatement();
+      String sqlQ;
+      sqlQ = "SELECT * \n" +
+              "FROM Listings l JOIN Amenities a ON l.listing_ID=a.listing_ID\n" +
+              "WHERE l.listing_ID=" + Listing_ID + "\n";
+      System.out.println(sqlQ);
+      ResultSet rs = st.executeQuery(sqlQ);
+      String amenity;
+      while (rs.next()) {
+        amenity = rs.getString("amenity_type");
+        amenities.add(amenity);
+      }
 
+      System.out.println("Amenities = " + amenities);
 
-}
+    }
+
+  }
