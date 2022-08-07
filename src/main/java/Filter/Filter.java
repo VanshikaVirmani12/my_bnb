@@ -218,7 +218,7 @@ public class Filter {
     if (empty == 0){
       System.out.println("No filter applied! here are the first 20 results from listing: ");
       // Display the first 20 listings and return to the filters page
-      System.exit(0);
+      return;
     }
 
 //    st = connection.createStatement();
@@ -480,7 +480,7 @@ public class Filter {
 
   public static void set_listing_array() throws SQLException {
     sqlQ = "SELECT * from listings\n";
-    System.out.println("Setting listing_array: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
+    //System.out.println("Setting listing_array: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
     rs = sql.executeQuery(sqlQ);
     while(rs.next()){
       LISTING_SET.add(rs.getInt("Listing_ID"));
@@ -522,14 +522,14 @@ public class Filter {
     // define a default distance
     // order by distance
     sqlQ = "SELECT * from listings\n";
-    System.out.println("Executing this filter_by_long_lat: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
+    //System.out.println("Executing this filter_by_long_lat: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
     rs = sql.executeQuery(sqlQ);
 
     while (rs.next()){
       double lon = rs.getDouble("longitude");
       double lat = rs.getDouble("latitude");
       double get_distance = get_distance_lon_lat(longitude, latitude, lon, lat);
-      System.out.println("get_distance = "+ get_distance+ " and distance = " +distance);
+      //System.out.println("get_distance = "+ get_distance+ " and distance = " +distance);
       if (get_distance <= distance){
         location_set.add(rs.getInt("Listing_ID"));
       }
@@ -539,13 +539,13 @@ public class Filter {
   public static void set_postal_code() throws SQLException{
     // same or adjacent postal codes
     sqlQ = "SELECT * from listings\n";
-    System.out.println("Executing this filter_by_postal_code: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
+    //System.out.println("Executing this filter_by_postal_code: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
     rs = sql.executeQuery(sqlQ);
 
     while (rs.next()){
       String code = rs.getString("postal_code");
       double get_distance = get_distance_postal_code(code, postal_code);
-      System.out.println("get_distance = "+ get_distance+ " and distance = " +distance);
+      //System.out.println("get_distance = "+ get_distance+ " and distance = " +distance);
       if (get_distance<= distance){
         postal_code_set.add(rs.getInt("Listing_ID"));
       }
@@ -555,7 +555,7 @@ public class Filter {
   public static void set_address() throws SQLException {
     sqlQ = "SELECT * from listings\n" +
             "\tWHERE apt_name LIKE "+ "'"+ apt_name + "'"+" AND city LIKE "+ "'"+city + "'"+ " AND country LIKE "+"'"+ country +"'"+ " AND postal_code LIKE "+"'"+postal_code+"'"+"\n";
-    System.out.println("Executing this filter_by_address: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
+    //System.out.println("Executing this filter_by_address: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
     rs = sql.executeQuery(sqlQ);
 
     while (rs.next()){
@@ -565,76 +565,70 @@ public class Filter {
 
   public static void set_dates() throws SQLException {
     sqlQ = "SELECT * from Listings\n";
-    System.out.println("Executing this set_dates: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
+    //System.out.println("Executing this set_dates: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
     rs = sql.executeQuery(sqlQ);
     int avail;
     while (rs.next()){
       int listing = rs.getInt("listing_ID");
       avail = checkAvailability(listing);
-      System.out.println("AVAILABILITY FOR LISTING ID = "+listing+ ": "+ avail);
+      //System.out.println("AVAILABILITY FOR LISTING ID = "+listing+ ": "+ avail);
       if (avail == 1){
         dates_set.add(listing);
-        System.out.println(listing);
+        //System.out.println(listing);
         //System.out.println(dates_set);
       }
     }
   }
 
   public static void set_amenities() throws SQLException {
-    ArrayList<String> desired_amenities = new ArrayList<String>();
-    if (has_ac == 1){
-      desired_amenities.add("Air-conditioning");
-    }if(has_dryer == 1){
-      desired_amenities.add("Dryer");
+    ArrayList<Integer> desired_amen = new ArrayList<Integer>(5);
+    if(has_ac == 1){
+      desired_amen.add(5);
+    }if (has_dryer == 1){
+      desired_amen.add(4);
     }if (has_kitchen == 1){
-      desired_amenities.add("Kitchen");
+      desired_amen.add(2);
+    }if (has_washer ==1){
+      desired_amen.add(3);
     }if (has_wifi == 1){
-      desired_amenities.add("Wifi");
-    }if (has_washer == 1){
-      desired_amenities.add("Washer");
+      desired_amen.add(1);
     }
-    int is_there = 1; // initially set to true, if not found, turns to 0
-    for (int listing_id : LISTING_SET) {
-      ArrayList<String> has_aminites = new ArrayList<String>();
-      sqlQ = "SELECT amenity_type from Amenities where  listing_ID = " + "'" + listing_id + "'" + "\n";
+    int amen_id;
+    ArrayList<Integer> has_amen = new ArrayList<Integer>(5);
+    for (int listing_id : LISTING_SET){
+      has_amen.clear();
+      int satisfies = 1;
+      sqlQ = "Select amenity_ID from amenities where listing_ID = "+"'"+listing_id+"'"+"\n";
       rs = sql.executeQuery(sqlQ);
-      System.out.println("Executing this filter_by_amenities: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
-      while (rs.next()) {
-        //is_there = 1;
-        String amenity_name = rs.getString("amenity_type");
-        has_aminites.add(amenity_name);
-        //System.out.println(has_aminites);
-      }
-//      for (String amen : desired_amenities) {
-//        if (has_aminites.isEmpty() || !has_aminites.contains(amen)) {
-//          is_there = 0;
-//          break;
-//        }
-//      }
-
-      for (String amen : desired_amenities ) {
-        if (listing_id == 2){
-          System.out.println(amen);
-          System.out.print(has_aminites);
-          System.out.println(has_aminites.contains(amen));
-        }
-
-        if (has_aminites.contains(amen) == false) {
-          is_there = 0;
-          break;
+      while(rs.next()){
+        amen_id = rs.getInt("amenity_ID");
+        has_amen.add(amen_id);
+        if(listing_id == 3){
+          System.out.println("Adding amen!!!! : "+amen_id);
         }
       }
+      for (int amen: desired_amen){
+        if(listing_id == 3){
+          System.out.println("Value of amen: "+amen);
+          System.out.println("Value of has_amen: "+has_amen);
+          System.out.println("Value of bool: "+!has_amen.contains(amen));
 
-      if (listing_id == 2){
-        System.out.println("Has amenites for 2" + has_aminites);
-        System.out.println("Is there?///// " + is_there);
+        }
+        if(!has_amen.contains(amen)){
+          satisfies = 0;
+        }
       }
-
-      if (is_there == 1) {
+      if (satisfies == 1){
         amenities_set.add(listing_id);
       }
+      if(listing_id == 3){
+        System.out.println("Value of satisfies: "+satisfies);
+      }
     }
+
+
   }
+
 
   //------------------------------------------HELPER FUNCTIONS--------------------------------------------
 
@@ -656,8 +650,8 @@ public class Filter {
   public static int get_distance_postal_code(String postal_code1, String postal_code2){
     int num1 = postal_code1.hashCode();
     int num2 = postal_code2.hashCode();
-    System.out.print(num1);
-    System.out.println(", "+ num2);
+    //System.out.print(num1);
+    //System.out.println(", "+ num2);
     return  Math.abs(num2 - num1);
   }
 
@@ -670,7 +664,7 @@ public class Filter {
 
     String getAllDateQuery = "SELECT COUNT(*) FROM Calender WHERE date >= " + "'" + start_date + "'" + " AND date <= "
             + "'" + end_date +  "'" + " AND listing_ID = " + listing + "\n";
-    System.out.println(getAllDateQuery);
+    //System.out.println(getAllDateQuery);
     ResultSet rs = st.executeQuery(getAllDateQuery);
 
     int count = 0;
@@ -700,7 +694,7 @@ public class Filter {
     sqlQ = "DELETE FROM Calender WHERE date >= " + "'" + start_date + "'" + " AND date <= "
             + "'" + end_date + "'" + " AND listing_ID = " + Listing_ID + "\n";
 
-    System.out.println(sqlQ);
+    //System.out.println(sqlQ);
     st.executeUpdate(sqlQ);
 
   }
@@ -727,7 +721,7 @@ public class Filter {
     // key is listing and value is distance
     for (int listing_id : LISTING_SET){
       sqlQ = "select * from listings where listing_ID =" + "'"+listing_id+"'"+"\n";
-      System.out.println("Executing this sort_by_location: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
+      //System.out.println("Executing this sort_by_location: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
       rs = sql.executeQuery(sqlQ);
       int lon, lat;
       while(rs.next()) {
@@ -735,7 +729,7 @@ public class Filter {
         lat = rs.getInt("latitude");
         double dis = get_distance_lon_lat(lon, lat, longitude, latitude);
         location_hashmap.put(listing_id, dis);
-        System.out.println("THIS IS THE DISTANCE FOR LOCATIONS: "+dis);
+        //System.out.println("THIS IS THE DISTANCE FOR LOCATIONS: "+dis);
       }
     }
     location_hashmap = sortByValue_double(location_hashmap);
@@ -745,14 +739,14 @@ public class Filter {
     // key is listing and value is distance
     for (int listing_id : LISTING_SET){
       sqlQ = "select * from listings where listing_ID =" + "'"+listing_id+"'"+"\n";
-      System.out.println("Executing this sort_by_postal_code: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
+      //System.out.println("Executing this sort_by_postal_code: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
       rs = sql.executeQuery(sqlQ);
       String post;
       while(rs.next()) {
         post = rs.getString("postal_code");
         int dis = get_distance_postal_code(post, postal_code);
         postal_code_hashmap.put(listing_id, dis);
-        System.out.println("THIS IS THE DISTANCE FOR POSTAL CODE: "+dis);
+        //System.out.println("THIS IS THE DISTANCE FOR POSTAL CODE: "+dis);
       }
     }
     postal_code_hashmap = sortByValue_integer(postal_code_hashmap);
@@ -762,7 +756,7 @@ public class Filter {
   public static void sort_by_prices() throws SQLException {
     for (int listing_id : LISTING_SET){
       sqlQ = "select * from calender where listing_ID =" + "'"+listing_id+"'"+"\n";
-      System.out.println("Executing this sort_by_postal_code: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
+      //System.out.println("Executing this sort_by_postal_code: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
       rs = sql.executeQuery(sqlQ);
       int pri;
       List<Integer> price_arr = new ArrayList<Integer>();
