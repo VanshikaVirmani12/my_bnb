@@ -50,6 +50,7 @@ public class Renter {
     System.out.println("13. Delete your Account");
     System.out.println("14. Exit");
 
+
     try {
       System.out.print("\nInput: ");
       selectedOption = scan.nextInt();
@@ -67,6 +68,7 @@ public class Renter {
     }
 
     while (selectedOption != 14){
+
       if(selectedOption == 1){
         Filter.get_address();
 
@@ -134,10 +136,6 @@ public class Renter {
       e.printStackTrace();
     }
     System.exit(0);
-  }
-
-  public static void createBooking() {
-
   }
 
 
