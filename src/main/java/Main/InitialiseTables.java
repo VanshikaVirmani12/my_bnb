@@ -61,26 +61,22 @@ public class InitialiseTables {
 
       sql.executeUpdate(sqlQ);
 
-      Integer[] prices = {50, 50, 50, 70, 70};
-      //Integer[] availability = {0, 0, 0, 1, 1};
-
       DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-      String[] dates = {"2022-01-01", "2022-01-02", "2022-01-03", "2022-01-04", "2022-01-05"};
       Integer[] listings = {1, 1, 1, 2, 2};
 
-      sqlQ = "INSERT INTO Calender VALUES (?,?,?)\n";
-      ps = connection.prepareStatement(sqlQ);
-      for (int i=0; i<5; i++){
+      sqlQ = "INSERT INTO Calender (date, price, listing_ID) " +
+              "VALUES " +
+              "('2022-01-01', 50, 1),\n" +
+              "('2022-01-02', 50, 1),\n" +
+              "('2022-01-03', 50, 1),\n" +
+              "('2022-01-04', 20, 1),\n" +
+              "('2022-01-05', 70, 1),\n" +
+              "('2022-01-06', 70, 1),\n" +
+              "('2022-01-04', 60, 2),\n" +
+              "('2022-01-05', 60, 2)\n";
 
-        Date myDate = formatter.parse(dates[i]);
-        java.sql.Date sqlDate = new java.sql.Date(myDate.getTime());
-        ps.setDate(1, sqlDate);
-        ps.setInt(2,prices[i]);
-        ps.setInt(3,listings[i]);
-        // ps.setInt(4,availability[i]);
-        ps.executeUpdate();
-      }
-      ps.close();
+      sql.executeUpdate(sqlQ);
+
 //
 //      sqlQ = "create table has_availability(\n" +
 //              "\tdate Date NOT NULL,\n" +
@@ -298,30 +294,6 @@ public class InitialiseTables {
 //      ps.close();
 
       // review(comment, rating, rev_id, listing_id, host_id, renter_id)
-      sqlQ = "create table Review(\n" +
-              "\treview_ID INT NOT NULL AUTO_INCREMENT,\n" +
-              "\tbooking_ID integer,\n" +
-              "\thost_ID integer,\n" +
-              "\trenter_ID integer,\n" +
-              "\tcomment varchar(200),\n" +
-              "\trating integer,\n" +
-              "\thost_to_renter integer,\n" +
-              "\trenter_to_host integer,\n" +
-              "\trenter_to_listing integer,\n" +
-              "\tprimary key(review_ID), index(booking_ID), index(listing_ID), index(host_ID),  index(renter_ID),\n" +
-              "\tFOREIGN KEY (host_ID) REFERENCES Host(SIN),\n" +
-              "\tFOREIGN KEY (renter_ID) REFERENCES Renter(SIN),\n" +
-              "\tFOREIGN KEY (booking_ID) REFERENCES Bookings(booking_ID))\n";
-
-      sql.executeUpdate(sqlQ);
-
-      sqlQ = "INSERT INTO Review (booking_ID, host_ID, renter_ID, comment, rating, host_to_renter, " +
-              "renter_to_host, renter_to_listing) VALUES " +
-              "(1, 0, 2,'Amazing view', 4, 0, 0, 1),\n" +
-              "(2, 0, 2,'Good host', 3, 0, 1, 0),\n" +
-              "(1, 0, 2,'Good renter', 4, 1, 0, 0)\n";
-
-      sql.executeUpdate(sqlQ);
 
       sqlQ = "create table Bookings(\n" +
               "\tbooking_ID INT NOT NULL AUTO_INCREMENT,\n" +
@@ -351,6 +323,31 @@ public class InitialiseTables {
       sql.executeUpdate(sqlQ);
 
       sqlQ = "INSERT INTO rents (SIN, listing_ID) VALUES (2, 1), (2, 2)\n";
+      sql.executeUpdate(sqlQ);
+
+      sqlQ = "create table Review(\n" +
+              "\treview_ID INT NOT NULL AUTO_INCREMENT,\n" +
+              "\tbooking_ID integer,\n" +
+              "\thost_ID integer,\n" +
+              "\trenter_ID integer,\n" +
+              "\tcomment varchar(200),\n" +
+              "\trating integer,\n" +
+              "\thost_to_renter integer,\n" +
+              "\trenter_to_host integer,\n" +
+              "\trenter_to_listing integer,\n" +
+              "\tprimary key(review_ID), index(booking_ID), index(host_ID),  index(renter_ID),\n" +
+              "\tFOREIGN KEY (host_ID) REFERENCES Host(SIN),\n" +
+              "\tFOREIGN KEY (renter_ID) REFERENCES Renter(SIN),\n" +
+              "\tFOREIGN KEY (booking_ID) REFERENCES Bookings(booking_ID))\n";
+
+      sql.executeUpdate(sqlQ);
+
+      sqlQ = "INSERT INTO Review (booking_ID, host_ID, renter_ID, comment, rating, host_to_renter, " +
+              "renter_to_host, renter_to_listing) VALUES " +
+              "(1, 0, 2,'Amazing view', 4, 0, 0, 1),\n" +
+              "(2, 0, 2,'Good host', 3, 0, 1, 0),\n" +
+              "(1, 0, 2,'Good renter', 4, 1, 0, 0)\n";
+
       sql.executeUpdate(sqlQ);
 
 //      Integer[] rents_from = {0, 1, 0, 1, 1};

@@ -557,7 +557,7 @@ public class Listing {
 //      ResultSet result = st.executeQuery(st1);
 //
 //      int price;
-//      DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+//      DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 //
 //      result.next();
 //      price = result.getInt("price");

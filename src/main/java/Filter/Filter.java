@@ -22,6 +22,7 @@ import static Listing.Listing.get_Listing_ID;
 
 public class Filter {
   private static int Booking_ID = 0;
+  private static int Listing_ID = 0;
   private static String apt_name = null, city = null, country = null, postal_code = null;
   private static int longitude;
   private static int latitude;
@@ -267,7 +268,68 @@ public class Filter {
     }
     // Now LISTING_SET has the filtered listing ids.
     print_listings();
+    displayListingsRenter();
     reset_global_variables();
+  }
+
+  public static void displayListingsRenter() throws SQLException {
+    System.out.print("Here are all the listings available after the filtering\n");
+
+    st = connection.createStatement();
+    int SIN = User.LoginPage.getSIN();
+    String sqlQ;
+
+    for (int element : LISTING_SET) {
+      Listing_ID = element;
+      sqlQ = "SELECT * \n" +
+              "FROM Listings l JOIN Calender c on l.listing_ID = c.listing_ID\n" +
+              "WHERE l.listing_ID = " + Listing_ID + "" +
+              " AND c.date >='" + start_date + "' AND c.date <= '" + end_date + "'\n";
+
+      System.out.println(sqlQ);
+      ResultSet rs = st.executeQuery(sqlQ);
+
+      String room, postal, city, country, apt;
+      int listing_ID, price;
+      Date start, end, date;
+
+      rs.next();
+      price = rs.getInt("price");
+      start = rs.getDate("date");
+      end = start; date = start;
+
+      listing_ID = rs.getInt("listing_ID");
+      room = rs.getString("room_type");
+      apt = rs.getString("apt_name");
+      city = rs.getString("city");
+      country = rs.getString("country");
+      postal = rs.getString("postal_code");
+
+      System.out.println("Listing ID = " + listing_ID);
+      System.out.println("Room type = " + room);
+      System.out.println("Apartment name/Road = " + apt);
+      System.out.println("City = " + city);
+      System.out.println("Country = " + country);
+      System.out.println("Postal code = " + postal);
+
+      int new_price;
+      while(rs.next()){
+        end = date;
+        new_price = rs.getInt("price");
+        date =  rs.getDate("date");
+        if (new_price != price) {
+          System.out.println("Available from " + start + " to " + end + " for price " + price);
+          start.setDate(end.getDate() + 1);
+          price = new_price;
+        }
+      }
+      start = end;
+      end = date;
+      //start.setDate(end.getDate() - 1);
+      System.out.println("Available from " + start + " to " + end + " for price " + price);
+      System.out.println("-----------------------------------------------\n");
+    }
+
   }
 
   private static void print_listings() throws SQLException {
