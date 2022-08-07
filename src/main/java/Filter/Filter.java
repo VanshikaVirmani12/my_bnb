@@ -233,14 +233,15 @@ public class Filter {
       //System.out.println("set of filtered: "+ postal_code_set);
       LISTING_SET.retainAll(postal_code_set);
       //System.out.println("list after: "+ LISTING_SET);
-      sort_by_postal_code();
+      //sort_by_postal_code();
+      //System.out.println("list after sorting: "+ LISTING_SET);
     }
     if (updated_amenities == 1){
       //System.out.println(LISTING_SET);
       set_amenities();
-      //System.out.println(amenities_set);
+      //System.out.println("Amenitites Set: "+ amenities_set);
       LISTING_SET.retainAll(amenities_set);
-      //System.out.println(LISTING_SET);
+      //System.out.println("After listing set: "+LISTING_SET);
     }
     if(updated_location == 1){
       //System.out.println("list before: "+ LISTING_SET);
@@ -248,12 +249,11 @@ public class Filter {
       //System.out.println("set of filtered: "+ location_set);
       LISTING_SET.retainAll(location_set);
       //System.out.println("list after: "+ LISTING_SET);
-      sort_by_location();
     }
     if(updated_prices == 1){
       set_prices();
       LISTING_SET.retainAll(prices_set);
-      sort_by_prices();
+      //sort_by_prices();
     }
     if (updated_dates == 1){
       set_dates();
@@ -330,6 +330,7 @@ public class Filter {
 
     // The above code makes sure either one of the 3 is true!
     if(updated_location ==1){
+      sort_by_location();
       LISTING_SET.clear();
       for (HashMap.Entry<Integer, Double> entry : location_hashmap.entrySet()) {
         LISTING_SET.add(entry.getKey());
@@ -339,12 +340,14 @@ public class Filter {
       }
       //System.out.println(location_hashmap);
     }else if (updated_postal_code == 1){
+      sort_by_postal_code();
       LISTING_SET.clear();
       for (HashMap.Entry<Integer, Integer> entry : postal_code_hashmap.entrySet()) {
         LISTING_SET.add(entry.getKey());
       }
       //System.out.println(postal_code_hashmap);
     }else if (updated_prices == 1){
+      sort_by_prices();
       LISTING_SET.clear();
       for (HashMap.Entry<Integer, Integer> entry : prices_hashmap.entrySet()) {
         LISTING_SET.add(entry.getKey());
@@ -625,7 +628,6 @@ public class Filter {
         System.out.println("Value of satisfies: "+satisfies);
       }
     }
-
 
   }
 
