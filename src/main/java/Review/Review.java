@@ -205,7 +205,6 @@ public class Review {
       host_ID = rs.getInt("SIN");
     }
 
-
     sqlQ = "INSERT INTO Review (booking_ID, host_ID, renter_ID, comment, rating, host_to_renter, " +
             "renter_to_host, renter_to_listing) VALUES (" +
             Booking_ID + ", " + host_ID + ", " + renter_ID + ", '" + comment + "', " + rating + ", 0, 0, 1)\n";
