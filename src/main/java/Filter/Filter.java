@@ -41,13 +41,6 @@ public class Filter {
   private static int updated_prices = 0;
   private static int updated_location = 0;
   private static int updated_amenities = 0;
-  private static String sql_dates = "";
-  private static String sql_address = "";
-  private static String sql_postal_code = "";
-  private static String sql_prices = "";
-  private static String sql_location = "";
-  private static String sql_amenities = "";
-  private static String QUERY ="";
   private static String sqlQ = "";
 
   // USING HASHMAPS IN SORTING THE HASHMAPS ACCORDING TO THE DISTANCE OR PRICES
@@ -122,7 +115,52 @@ public class Filter {
     updated_dates = 1;
   }
 
-  public static void get_budget(){
+  public static void get_budget() throws SQLException {
+    if (updated_dates == 0){
+      System.out.println("Please specify the dates you would want to look for.");
+      System.out.print("Start date: ");
+      start_date = scan.next();
+      System.out.print("End date: ");
+      end_date = scan.next();
+      set_dates();
+
+      while(dates_set.isEmpty()) {
+        System.out.print("Sorry, the dates entered aren't available. Please enter 1 to change dates or 2 to return to the menu: ");
+        int choice = scan.nextInt();
+        if (choice == 1) {
+          System.out.print("Start date: ");
+          start_date = scan.next();
+          System.out.print("End date: ");
+          end_date = scan.next();
+          set_dates();
+        } else {
+          return;
+        }
+      }
+
+
+
+//      if(dates_set.isEmpty()) {
+//        System.out.print("Sorry, the dates entered aren't available. Please enter 1 to change dates or 2 to return to the menu: ");
+//        int choice = scan.nextInt();
+//        if (choice == 1){
+//          get_budget();
+//        }else{
+//          return;
+//      }
+//      Listing.startDate = start_date;
+//      Listing.endDate = end_date;
+//      int avail = Listing.checkAvailability();
+//      if (avail != 1){
+//        System.out.print("Sorry, the dates entered aren't available. Please enter 1 to change dates or 2 to return to the menu: ");
+//        int choice = scan.nextInt();
+//        if (choice == 1){
+//          get_budget();
+//        }else{
+//          return;
+//        }
+      updated_dates = 1;
+    }
     System.out.println("Please type in the budget:");
     System.out.print("Start Price: ");
     low_price = scan.nextInt();
@@ -311,8 +349,11 @@ public class Filter {
       for (HashMap.Entry<Integer, Integer> entry : prices_hashmap.entrySet()) {
         LISTING_SET.add(entry.getKey());
       }
-      //System.out.println(prices_hashmap);
+      System.out.println(prices_hashmap);
     }
+
+
+    System.out.println("THE FILTERED LISTINGS ARE: "+LISTING_SET);
 
     // iterate over the listings in LISTING_SET and print data
 //    ArrayList <Integer> array = new ArrayList<>(); // to make sure that no duplicate listings are displayed
@@ -423,14 +464,16 @@ public class Filter {
     updated_prices = 0;
     updated_location = 0;
     updated_amenities = 0;
-    sql_dates = "";
-    sql_address = "";
-    sql_postal_code = "";
-    sql_prices = "";
-    sql_location = "";
-    sql_amenities = "";
-    QUERY ="";
     LISTING_SET.clear();
+    dates_set.clear();
+    location_set.clear();
+    address_set.clear();
+    amenities_set.clear();
+    postal_code_set.clear();
+    prices_set.clear();
+    postal_code_hashmap.clear();
+    location_hashmap.clear();
+    prices_hashmap.clear();
   }
 
   //----------------------------------------------SETTING SETS-----------------------------------------------------
@@ -445,12 +488,33 @@ public class Filter {
   }
 
   public static void set_prices() throws SQLException {
-    sqlQ = "SELECT * from Calender\n" +
-            "\tWHERE price >= "+ "'"+ low_price+ "'"+ " AND price <= "+"'"+ high_price+"'"+ "\n" +
-            "\tORDER BY price\n";
-    rs = sql.executeQuery(sqlQ);
-    while(rs.next()){
-      prices_set.add(rs.getInt("Listing_ID"));
+    set_dates();
+//    if (dates_set.isEmpty()) {
+//      System.out.print("Sorry, there are no listings available for the dates specified! Click 1 to enter new set of dates and 2 to go back to the menu: ");
+//      return;
+//    }
+//      int choice = scan.nextInt();
+//      if (choice == 1) {
+//        updated_dates = 0;
+//        get_budget();
+//      }else{
+//        return;
+//      }
+//    }
+    int price;
+    for (int listing_id : LISTING_SET){
+      sqlQ = "SELECT price from Calender where listing_ID = "+ "'" + listing_id +"'" +"\n";
+      rs = sql.executeQuery(sqlQ);
+      int add = 1;
+      while(rs.next()){
+        price = rs.getInt("price");
+        if(price > high_price || price < low_price){
+          add = 0;
+        }
+      }
+      if (add == 1){
+        prices_set.add(listing_id);
+      }
     }
   }
 
@@ -507,6 +571,7 @@ public class Filter {
     while (rs.next()){
       int listing = rs.getInt("listing_ID");
       avail = checkAvailability(listing);
+      System.out.println("AVAILABILITY FOR LISTING ID = "+listing+ ": "+ avail);
       if (avail == 1){
         dates_set.add(listing);
         System.out.println(listing);
@@ -696,17 +761,22 @@ public class Filter {
 
   public static void sort_by_prices() throws SQLException {
     for (int listing_id : LISTING_SET){
-      sqlQ = "select * from Calendar where listing_ID =" + "'"+listing_id+"'"+"\n";
+      sqlQ = "select * from calender where listing_ID =" + "'"+listing_id+"'"+"\n";
       System.out.println("Executing this sort_by_postal_code: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
       rs = sql.executeQuery(sqlQ);
       int pri;
+      List<Integer> price_arr = new ArrayList<Integer>();
       while(rs.next()) {
         pri = rs.getInt("price");
+        price_arr.add(pri);
+        //System.out.println("THIS IS THE Price FOR prices: "+pri);
+      }
+      if (!price_arr.isEmpty()){
+        pri = Collections.max(price_arr);
         prices_hashmap.put(listing_id, pri);
-        System.out.println("THIS IS THE Price FOR prices: "+pri);
       }
     }
-    prices_hashmap = sortByValue_integer(postal_code_hashmap);
+    prices_hashmap = sortByValue_integer(prices_hashmap);
 
   }
 
