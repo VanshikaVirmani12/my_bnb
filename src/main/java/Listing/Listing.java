@@ -19,7 +19,7 @@ import Main.Main;
 import User.Host;
 
 public class Listing {
-  private static int Listing_ID = 0;
+  public static int Listing_ID = 0;
   private static int Booking_ID;
   private static Connection connection = ConnectionEstablish.ConnectToJDBC.getMySqlConnection();
   private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -33,9 +33,9 @@ public class Listing {
   private static String apt_name = null, city = null, country = null;
   private static int longitude;
   private static int latitude;
-  private static int price;
-  private static String startDate;
-  private static String endDate;
+  public static int price;
+  public static String startDate;
+  public static String endDate;
   private static int wifi, washer, ac, kitchen, dryer;
   private static HashMap<Integer, String> mapListingInfo = new HashMap<>();
   private static String[] room_types = {"Apartment", "House", "Room"};
@@ -362,6 +362,7 @@ public class Listing {
 
     System.out.println(sqlQ);
     st.executeUpdate(sqlQ);
+
     Host.startPage();
 
   }
@@ -492,7 +493,8 @@ public class Listing {
 
     // for each listing_id you own, what are the bookings associated with it that have already been completed?
     //delete b from bookings b join owns o on b.listing_ID=o.listing_ID where b.listing_ID=1;
-    sqlQ = "SELECT b FROM Bookings b JOIN owns o ON b.listing_ID=o.listing_ID WHERE b.booking_ID = " + Booking_ID + "\n";
+    sqlQ = "SELECT * FROM Bookings b JOIN owns o ON b.listing_ID=o.listing_ID WHERE b.booking_ID = " +
+            "" + Booking_ID + " AND o.SIN = " + SIN + " AND b.completed=0\n";
     System.out.println(sqlQ);
     ResultSet rs = st.executeQuery(sqlQ);
 
@@ -503,12 +505,19 @@ public class Listing {
       end = rs.getDate("end");
     }
 
-    sqlQ = "DELETE b FROM Bookings b JOIN owns o ON b.listing_ID=o.listing_ID WHERE b.listing_ID = " + Listing_ID + "\n";
+    sqlQ = "DELETE b FROM Bookings b JOIN owns o ON b.listing_ID=o.listing_ID WHERE b.booking_ID = " +
+            "" + Booking_ID + " AND o.SIN = " + SIN + " AND b.completed=0\n";
+    System.out.println(sqlQ);
+    st.executeUpdate(sqlQ);
+
+
+    sqlQ = "DELETE r FROM rents r WHERE r.booking_ID=" +
+            "" + Booking_ID + "\n";
     System.out.println(sqlQ);
     st.executeUpdate(sqlQ);
 
     System.out.println("This booking has been cancelled\n");
-    DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     startDate = dateFormat.format(start);
     endDate = dateFormat.format(end);
@@ -557,7 +566,7 @@ public class Listing {
 //      ResultSet result = st.executeQuery(st1);
 //
 //      int price;
-//      DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+//      DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 //
 //      result.next();
 //      price = result.getInt("price");

@@ -28,7 +28,7 @@ public class Renter {
 
   private static Scanner scan = new Scanner(System.in);
 
-  public static void selectFilter() throws SQLException, ParseException {
+  public static void selectFilter() throws SQLException, ParseException, InterruptedException {
     Main.clearScreen();
     Main.welcomeScreenBanner();
     System.out.println("\t\t\t\t\t\t  View Filters \n");
@@ -43,7 +43,8 @@ public class Renter {
     System.out.println("6. Filter by Amenities");
     System.out.println("7. Search Listings");
     System.out.println("8. Book a listing");
-    System.out.println("9. Exit");
+    System.out.println("9. Cancel Booking");
+    System.out.println("10. Exit");
 
     try {
       System.out.print("\nInput: ");
@@ -61,7 +62,7 @@ public class Renter {
       selectFilter();
     }
 
-    while (selectedOption != 9){
+    while (selectedOption != 10){
       if(selectedOption == 1){
         Filter.get_address();
 
@@ -85,7 +86,12 @@ public class Renter {
       }else if (selectedOption == 8){
         //System.out.println("hi, selected 8");
         Filter.book_listing();
-      }else {
+      }
+      else if (selectedOption == 9){
+        System.out.println("Cancel a Booking");
+        Filter.cancelBooking();
+      }
+      else {
         System.out.println("Input only numbers... Try again!!!");
         System.out.println("Redirecting to Filter.Filter page menu...");
         scan.nextLine();

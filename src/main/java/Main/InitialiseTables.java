@@ -353,8 +353,8 @@ public class InitialiseTables {
               "\tlisting_ID integer,\n" +
               "\tprimary key(booking_ID, listing_ID, SIN), index(booking_ID), index(listing_ID), index(SIN),\n" +
               "\tFOREIGN KEY (SIN) REFERENCES User(SIN),\n" +
-              "\tFOREIGN KEY (listing_ID) REFERENCES Listings(listing_ID),\n" +
-              "\tFOREIGN KEY (booking_ID) REFERENCES Bookings(booking_ID))\n";
+              "\tFOREIGN KEY (listing_ID) REFERENCES Listings(listing_ID))\n";
+              //"\tFOREIGN KEY (booking_ID) REFERENCES Bookings(booking_ID))\n";
 
       sql.executeUpdate(sqlQ);
 
