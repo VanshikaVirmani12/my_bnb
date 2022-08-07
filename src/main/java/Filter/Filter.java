@@ -1,4 +1,5 @@
 package Filter;
+import User.LoginPage;
 import User.Renter;
 import java.sql.Connection;
 import java.sql.Date;
@@ -15,6 +16,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.lang.*;
 import static Listing.Listing.getDatesBetween;
+import Listing.*;
 import static Listing.Listing.get_Listing_ID;
 
 public class Filter {
@@ -373,7 +375,7 @@ public class Filter {
 
 
   //------------------------------------------BOOKING A LISTING--------------------------------------------
-  public static void book_listing() throws SQLException, ParseException {
+  public static void book_listing() throws SQLException, ParseException, InterruptedException {
     System.out.print("Please enter the listing ID for the listing you want to book: ");
     int id = scan.nextInt();
     if (updated_dates == 0){
@@ -744,6 +746,95 @@ public class Filter {
       temp.put(aa.getKey(), aa.getValue());
     }
     return temp;
+  }
+
+
+  public static void viewBookings() throws SQLException {
+    System.out.print("Here are all the bookings that you have made\n");
+
+    st = connection.createStatement();
+    int SIN = User.LoginPage.getSIN();
+    String sqlQ;
+    // for each listing_id you rented, what are the bookings associated with it?
+
+    sqlQ = "SELECT *\n" +
+            "FROM Bookings b INNER JOIN rents r ON b.booking_ID = r.booking_ID\n" +
+            "WHERE r.SIN=" + SIN + "\n";
+    System.out.println(sqlQ);
+    ResultSet rs = st.executeQuery(sqlQ);
+
+    Date start, end;
+    String c = "No";
+    int listing_ID, renter_ID, completed, booking_ID;
+
+    while (rs.next()) {
+      booking_ID = rs.getInt("booking_ID");
+      listing_ID = rs.getInt("listing_ID");
+      renter_ID = rs.getInt("renter_ID");
+      start = rs.getDate("start");
+      end = rs.getDate("end");
+      completed = rs.getInt("completed");
+      if (completed == 1) {
+        c = "Yes";
+      } else {
+        c = "No";
+      }
+      System.out.println("Booking ID = " + booking_ID);
+      System.out.println("Listing ID = " + listing_ID);
+      System.out.println("Renter ID = " + renter_ID);
+      System.out.println("Start date of Booking = " + start);
+      System.out.println("End date of Booking = " + end);
+      System.out.println("Booking completed = " + c);
+      System.out.println("------------------------------------\n");
+
+    }
+  }
+
+  public static void cancelBooking() throws SQLException, InterruptedException {
+    viewBookings();
+    System.out.print("Enter the Booking Id of the booking that you would like to cancel\n");
+    Booking_ID = scan.nextInt();
+
+    st = connection.createStatement();
+    int SIN = LoginPage.getSIN();
+    String sqlQ;
+
+    // for each listing_id you own, what are the bookings associated with it that have already been completed?
+    //delete b from bookings b join owns o on b.listing_ID=o.listing_ID where b.listing_ID=1;
+    sqlQ = "SELECT * FROM Bookings b JOIN rents r ON b.booking_ID=r.booking_ID WHERE b.booking_ID = " +
+            "" + Booking_ID + " AND r.SIN=" + SIN + " AND b.completed=0\n";
+    System.out.println(sqlQ);
+    ResultSet rs = st.executeQuery(sqlQ);
+
+    Date start = null, end = null;
+    int id = 0;
+    while(rs.next()) {
+      start = rs.getDate("start");
+      end = rs.getDate("end");
+      id = rs.getInt("listing_ID");
+    }
+
+    sqlQ = "DELETE b FROM Bookings b JOIN rents r ON b.booking_ID = r.booking_ID WHERE b.booking_ID = " +
+            "" + Booking_ID + " AND r.SIN=" + SIN + " AND b.completed=0\n";
+    System.out.println(sqlQ);
+    st.executeUpdate(sqlQ);
+
+    sqlQ = "DELETE r FROM rents r WHERE r.booking_ID=" +
+            "" + Booking_ID + " AND r.SIN=" + SIN + "\n";
+    System.out.println(sqlQ);
+    st.executeUpdate(sqlQ);
+
+    System.out.println("This booking has been cancelled\n");
+    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+    start_date = dateFormat.format(start);
+    end_date = dateFormat.format(end);
+    Listing.startDate = start_date;
+    Listing.endDate = end_date;
+    Listing.Listing_ID = id;
+    Listing.price = 50;
+    Listing.addAvailability();
+
   }
 
 
