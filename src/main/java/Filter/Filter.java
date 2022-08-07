@@ -46,6 +46,11 @@ public class Filter {
   private static String sql_amenities = "";
   private static String QUERY ="";
   private static String sqlQ = "";
+
+  // USING HASHMAPS IN SORTING THE HASHMAPS ACCORDING TO THE DISTANCE OR PRICES
+  static HashMap<Integer, Double> location_hashmap = new HashMap<Integer, Double>();
+  static HashMap<Integer, Integer> postal_code_hashmap = new HashMap<Integer, Integer>();
+  static HashMap<Integer, Integer> prices_hashmap = new HashMap<Integer, Integer>();
   private static Connection connection = ConnectionEstablish.ConnectToJDBC.getMySqlConnection();
   private static Scanner scan = new Scanner(System.in);
   private static Statement st;
@@ -182,23 +187,32 @@ public class Filter {
     set_listing_array();
 
     if(updated_postal_code == 1){
+      //System.out.println("list before: "+ LISTING_SET);
       set_postal_code();
+      //System.out.println("set of filtered: "+ postal_code_set);
       LISTING_SET.retainAll(postal_code_set);
+      //System.out.println("list after: "+ LISTING_SET);
+      sort_by_postal_code();
     }
     if (updated_amenities == 1){
-      System.out.println(LISTING_SET);
+      //System.out.println(LISTING_SET);
       set_amenities();
-      System.out.println(amenities_set);
+      //System.out.println(amenities_set);
       LISTING_SET.retainAll(amenities_set);
-      System.out.println(LISTING_SET);
+      //System.out.println(LISTING_SET);
     }
     if(updated_location == 1){
+      //System.out.println("list before: "+ LISTING_SET);
       set_location();
+      //System.out.println("set of filtered: "+ location_set);
       LISTING_SET.retainAll(location_set);
+      //System.out.println("list after: "+ LISTING_SET);
+      sort_by_location();
     }
     if(updated_prices == 1){
       set_prices();
       LISTING_SET.retainAll(prices_set);
+      sort_by_prices();
     }
     if (updated_dates == 1){
       set_dates();
@@ -216,64 +230,145 @@ public class Filter {
   }
 
   private static void print_listings() throws SQLException {
-    // iterate over the listings in LISTING_SET and print data
-    ArrayList <Integer> array = new ArrayList<>(); // to make sure that no duplicate listings are displayed
 
-    System.out.println("Here are the filtered listings: ");
-    int size = LISTING_SET.size();
-    //System.out.println(LISTING_SET);
-    for (int listing_id : LISTING_SET){
-      sqlQ = "SELECT * \n" +
-              "FROM Calender\n" +
-              "INNER JOIN Listings ON Listings.listing_ID = Calender.listing_ID " +
-              "WHERE Calender.listing_ID=" + listing_id + "\n";
-
-      rs = sql.executeQuery(sqlQ);
-      while (rs.next()){
-        if(!array.contains(listing_id)){
-          array.add(listing_id);
-          System.out.println("Listing ID = " + rs.getString("listing_ID"));
-          System.out.println("Room type = " + rs.getString("room_type"));
-          System.out.println("Apartment name/Road = " + rs.getString("apt_name"));
-          System.out.println("City = " + rs.getString("city"));
-          System.out.println("Country = " + rs.getString("country"));
-          System.out.println("Postal code = " + rs.getString("postal_code"));
-
-          String start, end, date;
-          int price;
-
-          start = start_date;
-          date = start;
-          price = rs.getInt("price");
-          DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
-
-
-          while (date != end_date) {
-            int new_price = rs.getInt("price");
-            if (price != new_price) {
-              end = date;
-              System.out.println("Available from = " + start + " to " + end + " for price " + price);
-              start = date;
-              LocalDate starting = LocalDate.parse(start, formatter);
-              starting = starting.plusDays(1);
-              start = dateFormat.format(date);
-            }
-          }
-          end = date;
-          if (end == null && start == null){
-            System.out.println("Available from = 'Not Specified' to = 'Not specified' for price " + price);
-          }else {
-            System.out.println("Available from = " + start + " to " + end + " for price " + price);
-          }
-
-
-          System.out.println("------------------------------------------------------------------------------");
-
-        }
-
+    if(updated_prices == 1 && updated_location == 1 && updated_postal_code == 1){
+      System.out.println("Enter 1 to see the filtering ordered by prices, 2 ordered by location and 3 ordered by postal code: ");
+      int choice = scan.nextInt();
+      if (choice == 1){
+        updated_prices = 1;
+        updated_location = 0;
+        updated_postal_code = 0;
+      }else if (choice == 2){
+        updated_prices = 0;
+        updated_location = 1;
+        updated_postal_code = 0;
+      }else if (choice == 3){
+        updated_prices = 0;
+        updated_location = 0;
+        updated_postal_code = 1;
+      }else {
+        System.out.print("Invalid option!");
       }
-
+    }else if (updated_postal_code == 1 && updated_location == 1){
+      System.out.println("Enter 1 to see the filtering ordered by postal code, 2 ordered by location: ");
+      int choice = scan.nextInt();
+      if (choice == 1){
+        updated_location = 0;
+        updated_postal_code = 1;
+      }else if (choice == 2) {
+        updated_location = 1;
+        updated_postal_code = 0;
+      }else {
+        System.out.println("Invalid choice!");
+      }
+    }else if (updated_postal_code == 1 && updated_prices == 1){
+      System.out.println("Enter 1 to see the filtering ordered by prices, 2 ordered by postal code: ");
+      int choice = scan.nextInt();
+      if (choice == 1){
+        updated_prices = 1;
+        updated_postal_code = 0;
+      }else if (choice == 2) {
+        updated_prices = 0;
+        updated_postal_code = 1;
+      }else {
+        System.out.println("Invalid choice!");
+      }
+    }else if (updated_location == 1 && updated_prices == 1 ){
+      System.out.println("Enter 1 to see the filtering ordered by prices, 2 ordered by location: ");
+      int choice = scan.nextInt();
+      if (choice == 1){
+        updated_prices = 1;
+        updated_location = 0;
+      }else if (choice == 2) {
+        updated_prices = 0;
+        updated_location = 1;
+      }else {
+        System.out.println("Invalid choice!");
+      }
     }
+
+    // The above code makes sure either one of the 3 is true!
+    if(updated_location ==1){
+      LISTING_SET.clear();
+      for (HashMap.Entry<Integer, Double> entry : location_hashmap.entrySet()) {
+        LISTING_SET.add(entry.getKey());
+        //System.out.println(entry.getKey());
+        //System.out.println("This is the hashmap: "+ location_hashmap);
+        //System.out.println("This is the new listing_set: "+ LISTING_SET);
+      }
+      //System.out.println(location_hashmap);
+    }else if (updated_postal_code == 1){
+      LISTING_SET.clear();
+      for (HashMap.Entry<Integer, Integer> entry : postal_code_hashmap.entrySet()) {
+        LISTING_SET.add(entry.getKey());
+      }
+      //System.out.println(postal_code_hashmap);
+    }else if (updated_prices == 1){
+      LISTING_SET.clear();
+      for (HashMap.Entry<Integer, Integer> entry : prices_hashmap.entrySet()) {
+        LISTING_SET.add(entry.getKey());
+      }
+      //System.out.println(prices_hashmap);
+    }
+
+    // iterate over the listings in LISTING_SET and print data
+//    ArrayList <Integer> array = new ArrayList<>(); // to make sure that no duplicate listings are displayed
+//
+//    System.out.println("Here are the filtered listings: ");
+//    int size = LISTING_SET.size();
+//    //System.out.println(LISTING_SET);
+//    for (int listing_id : LISTING_SET){
+//      sqlQ = "SELECT * \n" +
+//              "FROM Calender\n" +
+//              "INNER JOIN Listings ON Listings.listing_ID = Calender.listing_ID " +
+//              "WHERE Calender.listing_ID=" + listing_id + "\n";
+//
+//      rs = sql.executeQuery(sqlQ);
+//      while (rs.next()){
+//        if(!array.contains(listing_id)){
+//          array.add(listing_id);
+//          System.out.println("Listing ID = " + rs.getString("listing_ID"));
+//          System.out.println("Room type = " + rs.getString("room_type"));
+//          System.out.println("Apartment name/Road = " + rs.getString("apt_name"));
+//          System.out.println("City = " + rs.getString("city"));
+//          System.out.println("Country = " + rs.getString("country"));
+//          System.out.println("Postal code = " + rs.getString("postal_code"));
+//
+//          String start, end, date;
+//          int price;
+//
+//          start = start_date;
+//          date = start;
+//          price = rs.getInt("price");
+//          DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+//
+//
+//          while (date != end_date) {
+//            int new_price = rs.getInt("price");
+//            if (price != new_price) {
+//              end = date;
+//              System.out.println("Available from = " + start + " to " + end + " for price " + price);
+//              start = date;
+//              LocalDate starting = LocalDate.parse(start, formatter);
+//              starting = starting.plusDays(1);
+//              start = dateFormat.format(date);
+//            }
+//          }
+//          end = date;
+//          if (end == null && start == null){
+//            System.out.println("Available from = 'Not Specified' to = 'Not specified' for price " + price);
+//          }else {
+//            System.out.println("Available from = " + start + " to " + end + " for price " + price);
+//          }
+//
+//
+//          System.out.println("------------------------------------------------------------------------------");
+//
+//        }
+//
+//      }
+//
+//    }
   }
 
 
@@ -366,7 +461,9 @@ public class Filter {
     while (rs.next()){
       double lon = rs.getDouble("longitude");
       double lat = rs.getDouble("latitude");
-      if (get_distance_lon_lat(longitude, latitude, lon, lat) <= distance){
+      double get_distance = get_distance_lon_lat(longitude, latitude, lon, lat);
+      System.out.println("get_distance = "+ get_distance+ " and distance = " +distance);
+      if (get_distance <= distance){
         location_set.add(rs.getInt("Listing_ID"));
       }
     }
@@ -380,7 +477,9 @@ public class Filter {
 
     while (rs.next()){
       String code = rs.getString("postal_code");
-      if (get_distance_postal_code(code, postal_code) <= distance){
+      double get_distance = get_distance_postal_code(code, postal_code);
+      System.out.println("get_distance = "+ get_distance+ " and distance = " +distance);
+      if (get_distance<= distance){
         postal_code_set.add(rs.getInt("Listing_ID"));
       }
     }
@@ -536,6 +635,115 @@ public class Filter {
     System.out.println(sqlQ);
     st.executeUpdate(sqlQ);
 
+  }
+
+//  public static void sort_by_distance() throws SQLException {
+//    if (updated_postal_code == 1 && updated_location == 1){
+//      System.out.print("Enter 1 to sort by postal code. Enter 2 to sort by location. Where the distance is "+distance+". : ");
+//      int choice = scan.nextInt();
+//      if(choice == 1){
+//        sort_by_postal_code();
+//      }else{
+//        sort_by_location();
+//      }
+//    }else if (updated_location == 1){
+//      sort_by_location();
+//    }else if (updated_postal_code == 1){
+//      sort_by_postal_code();
+//    }else{
+//      System.out.println("No filter provided to sort through distance!");
+//    }
+//  }
+
+  public static void sort_by_location() throws SQLException {
+    // key is listing and value is distance
+    for (int listing_id : LISTING_SET){
+      sqlQ = "select * from listings where listing_ID =" + "'"+listing_id+"'"+"\n";
+      System.out.println("Executing this sort_by_location: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
+      rs = sql.executeQuery(sqlQ);
+      int lon, lat;
+      while(rs.next()) {
+        lon = rs.getInt("longitude");
+        lat = rs.getInt("latitude");
+        double dis = get_distance_lon_lat(lon, lat, longitude, latitude);
+        location_hashmap.put(listing_id, dis);
+        System.out.println("THIS IS THE DISTANCE FOR LOCATIONS: "+dis);
+      }
+    }
+    location_hashmap = sortByValue_double(location_hashmap);
+  }
+
+  public static void sort_by_postal_code() throws SQLException {
+    // key is listing and value is distance
+    for (int listing_id : LISTING_SET){
+      sqlQ = "select * from listings where listing_ID =" + "'"+listing_id+"'"+"\n";
+      System.out.println("Executing this sort_by_postal_code: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
+      rs = sql.executeQuery(sqlQ);
+      String post;
+      while(rs.next()) {
+        post = rs.getString("postal_code");
+        int dis = get_distance_postal_code(post, postal_code);
+        postal_code_hashmap.put(listing_id, dis);
+        System.out.println("THIS IS THE DISTANCE FOR POSTAL CODE: "+dis);
+      }
+    }
+    postal_code_hashmap = sortByValue_integer(postal_code_hashmap);
+
+  }
+
+  public static void sort_by_prices() throws SQLException {
+    for (int listing_id : LISTING_SET){
+      sqlQ = "select * from Calendar where listing_ID =" + "'"+listing_id+"'"+"\n";
+      System.out.println("Executing this sort_by_postal_code: \n" + sqlQ.replaceAll("\\s+", " ") + "\n");
+      rs = sql.executeQuery(sqlQ);
+      int pri;
+      while(rs.next()) {
+        pri = rs.getInt("price");
+        prices_hashmap.put(listing_id, pri);
+        System.out.println("THIS IS THE Price FOR prices: "+pri);
+      }
+    }
+    prices_hashmap = sortByValue_integer(postal_code_hashmap);
+
+  }
+
+
+  public static HashMap<Integer, Double> sortByValue_double(HashMap<Integer, Double> hm){
+    List<Map.Entry<Integer, Double>> list = new LinkedList<Map.Entry<Integer, Double>>(hm.entrySet());
+
+    // Sorting the list
+    Collections.sort(list, new Comparator<Map.Entry<Integer, Double>>() {
+      @Override
+      public int compare(Map.Entry<Integer, Double> o1, Map.Entry<Integer, Double> o2) {
+        return (o1.getValue().compareTo(o2.getValue()));
+      }
+    });
+
+    // put data from sorted list to hashmap
+    HashMap<Integer, Double> temp = new LinkedHashMap<Integer, Double>();
+    for (Map.Entry<Integer, Double> aa : list){
+      temp.put(aa.getKey(), aa.getValue());
+    }
+    return temp;
+  }
+
+  public static HashMap<Integer, Integer> sortByValue_integer(HashMap<Integer, Integer> hm){
+    List<Map.Entry<Integer, Integer>> list = new LinkedList<Map.Entry<Integer, Integer>>(hm.entrySet());
+
+    // Sorting the list
+    Collections.sort(list, new Comparator<Map.Entry<Integer, Integer>>() {
+      @Override
+      public int compare(Map.Entry<Integer, Integer> o1, Map.Entry<Integer, Integer> o2) {
+        return (o1.getValue().compareTo(o2.getValue()));
+      }
+    });
+
+    // put data from sorted list to hashmap
+    HashMap<Integer, Integer> temp = new LinkedHashMap<Integer, Integer>();
+    for (Map.Entry<Integer, Integer> aa : list){
+      temp.put(aa.getKey(), aa.getValue());
+    }
+    return temp;
   }
 
 
