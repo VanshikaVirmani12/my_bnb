@@ -1,4 +1,5 @@
 package Filter;
+import User.Host;
 import User.LoginPage;
 import User.Renter;
 import java.sql.Connection;

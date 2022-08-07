@@ -19,7 +19,7 @@ import Main.Main;
 import User.Host;
 
 public class Listing {
-  private static int Listing_ID = 0;
+  public static int Listing_ID = 0;
   private static int Booking_ID;
   private static Connection connection = ConnectionEstablish.ConnectToJDBC.getMySqlConnection();
   private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -33,9 +33,9 @@ public class Listing {
   private static String apt_name = null, city = null, country = null;
   private static int longitude;
   private static int latitude;
-  private static int price;
-  private static String startDate;
-  private static String endDate;
+  public static int price;
+  public static String startDate;
+  public static String endDate;
   private static int wifi, washer, ac, kitchen, dryer;
   private static HashMap<Integer, String> mapListingInfo = new HashMap<>();
   private static String[] room_types = {"Apartment", "House", "Room"};
