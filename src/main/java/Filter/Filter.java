@@ -23,6 +23,7 @@ import static Listing.Listing.get_Listing_ID;
 public class Filter {
   private static int Booking_ID = 0;
   private static int Listing_ID = 0;
+  private static int renter_ID = 0;
   private static String apt_name = null, city = null, country = null, postal_code = null;
   private static int longitude;
   private static int latitude;
@@ -278,58 +279,95 @@ public class Filter {
     int SIN = User.LoginPage.getSIN();
     String sqlQ;
 
-    for (int element : LISTING_SET) {
-      Listing_ID = element;
-      sqlQ = "SELECT * \n" +
-              "FROM Listings l JOIN Calender c on l.listing_ID = c.listing_ID\n" +
-              "WHERE l.listing_ID = " + Listing_ID + "" +
-              " AND c.date >='" + start_date + "' AND c.date <= '" + end_date + "'\n";
+    if (!LISTING_SET.isEmpty()) {
+      for (int element : LISTING_SET) {
+        Listing_ID = element;
+        if (start_date == null && end_date == null) {
 
-      System.out.println(sqlQ);
-      ResultSet rs = st.executeQuery(sqlQ);
+          sqlQ = "SELECT * \n" +
+                  "FROM Listings \n" +
+                  "WHERE listing_ID = " + Listing_ID + "\n";
+          System.out.println(sqlQ);
+          ResultSet rs = st.executeQuery(sqlQ);
 
-      String room, postal, city, country, apt;
-      int listing_ID, price;
-      Date start, end, date;
+          String room, postal, city, country, apt;
+          int listing_ID;
+          rs.next();
 
-      rs.next();
-      price = rs.getInt("price");
-      start = rs.getDate("date");
-      end = start;
-      date = start;
+          listing_ID = rs.getInt("listing_ID");
+          room = rs.getString("room_type");
+          apt = rs.getString("apt_name");
+          city = rs.getString("city");
+          country = rs.getString("country");
+          postal = rs.getString("postal_code");
 
-      listing_ID = rs.getInt("listing_ID");
-      room = rs.getString("room_type");
-      apt = rs.getString("apt_name");
-      city = rs.getString("city");
-      country = rs.getString("country");
-      postal = rs.getString("postal_code");
+          System.out.println("Listing ID = " + listing_ID);
+          System.out.println("Room type = " + room);
+          System.out.println("Apartment name/Road = " + apt);
+          System.out.println("City = " + city);
+          System.out.println("Country = " + country);
+          System.out.println("Postal code = " + postal);
 
-      System.out.println("Listing ID = " + listing_ID);
-      System.out.println("Room type = " + room);
-      System.out.println("Apartment name/Road = " + apt);
-      System.out.println("City = " + city);
-      System.out.println("Country = " + country);
-      System.out.println("Postal code = " + postal);
+          displayAmenities();
+          System.out.println("-----------------------------------------------\n");
 
-      displayAmenities();
+        }
 
-      int new_price;
-      while (rs.next()) {
-        end = date;
-        new_price = rs.getInt("price");
-        date = rs.getDate("date");
-        if (new_price != price) {
+        else {
+          sqlQ = "SELECT * \n" +
+                  "FROM Listings l JOIN Calender c on l.listing_ID = c.listing_ID\n" +
+                  "WHERE l.listing_ID = " + Listing_ID + "" +
+                  " AND c.date >='" + start_date + "' AND c.date <= '" + end_date + "'\n";
+
+          System.out.println(sqlQ);
+          ResultSet rs = st.executeQuery(sqlQ);
+
+          String room, postal, city, country, apt;
+          int listing_ID, price;
+          Date start, end, date;
+
+          rs.next();
+          price = rs.getInt("price");
+          start = rs.getDate("date");
+          end = start;
+          date = start;
+
+          listing_ID = rs.getInt("listing_ID");
+          room = rs.getString("room_type");
+          apt = rs.getString("apt_name");
+          city = rs.getString("city");
+          country = rs.getString("country");
+          postal = rs.getString("postal_code");
+
+          System.out.println("Listing ID = " + listing_ID);
+          System.out.println("Room type = " + room);
+          System.out.println("Apartment name/Road = " + apt);
+          System.out.println("City = " + city);
+          System.out.println("Country = " + country);
+          System.out.println("Postal code = " + postal);
+
+          displayAmenities();
+
+          int new_price;
+          while (rs.next()) {
+            end = date;
+            new_price = rs.getInt("price");
+            date = rs.getDate("date");
+            if (new_price != price) {
+              System.out.println("Available from " + start + " to " + end + " for price " + price);
+              start.setDate(end.getDate() + 1);
+              price = new_price;
+            }
+          }
+          start = end;
+          end = date;
+          //start.setDate(end.getDate() - 1);
           System.out.println("Available from " + start + " to " + end + " for price " + price);
-          start.setDate(end.getDate() + 1);
-          price = new_price;
+          System.out.println("-----------------------------------------------\n");
         }
       }
-      start = end;
-      end = date;
-      //start.setDate(end.getDate() - 1);
-      System.out.println("Available from " + start + " to " + end + " for price " + price);
-      System.out.println("-----------------------------------------------\n");
+    } else {
+      System.out.println("No results Found \n");
     }
 
   }
@@ -992,4 +1030,15 @@ public class Filter {
 
     }
 
+
+  public static void deleteRenter() throws SQLException, InterruptedException {
+    st = connection.createStatement();
+    renter_ID = LoginPage.getSIN();
+    String sqlQ;
+    sqlQ = "SELECT * \n" +
+            "FROM Listings l JOIN Amenities a ON l.listing_ID=a.listing_ID\n" +
+            "WHERE l.listing_ID=" + Listing_ID + "\n";
+    System.out.println(sqlQ);
+
+    }
   }
