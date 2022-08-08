@@ -48,7 +48,14 @@ public class Host {
     }
 
     if(selectedOption == 1) {
-      Listing.createNewListing();
+      System.out.println("There are some suggestions for you to benefit your listing!");
+      System.out.print("Enter 1 to look at suggestions, 2 to continue: ");
+      int choice = scan.nextInt();
+      if(choice == 1){
+        Listing.give_suggestions();
+      }else{
+        Listing.createNewListing();
+      }
     }else if(selectedOption == 2) {
       Listing.viewYourListings();
     }else if(selectedOption == 3){

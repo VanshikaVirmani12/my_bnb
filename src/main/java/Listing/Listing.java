@@ -605,4 +605,116 @@ public class Listing {
 
   }
 
+  public static void give_suggestions() throws SQLException {
+    System.out.print("Please enter the following information to know more about your listing: \n");
+    System.out.print("Specify the type of Listing. Enter 1 for Apartment, 2 for House, 3 for Rooms\n");
+    type = scan.nextInt();
+    scan.nextLine();
+    room_type = room_types[type - 1];
+    mapListingInfo.put(1, room_type);
+
+    System.out.print("Apartment/Road Name: ");
+    apt_name = scan.nextLine();
+    mapListingInfo.put(2, apt_name);
+
+    System.out.print("City: ");
+    city = scan.nextLine();
+    mapListingInfo.put(3, city);
+    System.out.print("Country: ");
+    country = scan.nextLine();
+    mapListingInfo.put(4, country);
+    System.out.print("Postal Code: ");
+    zipcode = scan.nextLine();
+    mapListingInfo.put(5, zipcode);
+
+    System.out.print("Latitude: ");
+    latitude = scan.nextInt();
+    scan.nextLine();
+    mapListingInfo.put(6, String.valueOf(latitude));
+    System.out.print("Longitude: ");
+    longitude = scan.nextInt();
+    scan.nextLine();
+    mapListingInfo.put(7, String.valueOf(longitude));
+
+    System.out.print("Enter the start and end dates of when the listing is available \n");
+
+    System.out.print("Start Date (YYYY-MM-DD): ");
+    startDate = scan.nextLine();
+    mapListingInfo.put(8, startDate);
+    System.out.print("End Date (YYYY-MM-DD): ");
+    endDate = scan.nextLine();
+    mapListingInfo.put(9, endDate);
+
+    System.out.print("Price: ");
+    price = scan.nextInt();
+    scan.nextLine();
+    mapListingInfo.put(10, String.valueOf(price));
+
+    System.out.print("Enter 1 for the amenities that are included in this listing. Enter 0 otherwise\n");
+    System.out.print("Wifi: ");
+    wifi = scan.nextInt();
+    scan.nextLine();
+    System.out.print("Washer: ");
+    washer = scan.nextInt();
+    scan.nextLine();
+    System.out.print("AC: ");
+    ac = scan.nextInt();
+    scan.nextLine();
+    System.out.print("Kitchen: ");
+    kitchen = scan.nextInt();
+    scan.nextLine();
+    System.out.print("Dryer: ");
+    dryer = scan.nextInt();
+    scan.nextLine();
+
+
+
+
+    String sqlQ = "select price from listings as l Join calender as c where l.listing_ID = c.listing_ID AND l.city = " + "'" + city+"'"+"\n";
+    System.out.println("Executing give suggestions, price");
+
+    st = connection.createStatement();
+    rs = st.executeQuery(sqlQ);
+    int sum = 0, count = 0;
+    while(rs.next()){
+      sum = rs.getInt("price");
+      count++;
+    }
+    int avg= 0;
+    if (count != 0 && sum != 0){
+      avg = sum/count;
+    }
+    if (avg != 0){
+      System.out.println("This is the average rate across the city you are posting for: " + avg);
+    }else {
+      System.out.println("This is the first listing being added in the city, so no suggested price available!");
+    }
+
+
+
+    String sqlQ2 = "select * from listings as l Join Amenities as c where l.listing_ID = c.listing_ID AND l.city = " + "'" + city+"'"+"\n";
+    System.out.println("Executing give suggestions, amenities");
+    st = connection.createStatement();
+    rs = st.executeQuery(sqlQ);
+
+    ArrayList<String> has_amenities = new ArrayList<String>(5);
+    String amen_type;
+    while (rs.next()){
+      amen_type = rs.getString("amenity_type");
+      if (!has_amenities.contains(amen_type)){
+        has_amenities.add(amen_type);
+      }
+    }
+    if (has_amenities.isEmpty()){
+      System.out.println("This is the first listing being added in the city, so no suggested amenities available!");
+    }else{
+      System.out.println("These are the amenities in provided by the other hosts in you area: "+has_amenities);
+      System.out.println("You can add the other amenities to boost your listing!");
+      // can also display the amenitites they would want to add to increase boosting
+    }
+
+
+    // ask if they want to change the price and amenities, and then if they want to take the new ifo and store that!
+
+  }
 }
