@@ -55,14 +55,14 @@ A report that presents for each listing the set of most popular noun phrases ass
     startDate = scan.nextLine();
     System.out.print("End Date (YYYY-MM-DD): ");
     endDate = scan.nextLine();
-
+    st = connection.createStatement();
     String sqlQ = "select count(*), l.city from bookings as b join listings as l on l.listing_id = b.listing_id where start <= '" + startDate + "' and end >= '" + endDate + "' group by l.city\n";
 
-    rs = sql.executeQuery(sqlQ);
+    rs = st.executeQuery(sqlQ);
     System.out.println("Total number of bookings between " + startDate + " and " + endDate + " in: ");
     while (rs.next()) {
       city = rs.getString("city");
-      System.out.print(city + ": " + rs.getInt("count(*)"));
+      System.out.println(city + ": " + rs.getInt("count(*)"));
     }
 
   }
@@ -73,22 +73,22 @@ A report that presents for each listing the set of most popular noun phrases ass
     startDate = scan.nextLine();
     System.out.print("End Date (YYYY-MM-DD): ");
     endDate = scan.nextLine();
-
+    st = connection.createStatement();
     String sqlQ = "select count(*), l.city, l.postal_code from bookings as b join listings as l on l.listing_id = b.listing_id where start <= '"+startDate+"' and end >= '"+endDate+"' group by l.city, l.postal_code order by l.city\n";
-    rs = sql.executeQuery(sqlQ);
+    rs = st.executeQuery(sqlQ);
     ArrayList<String> cities = new ArrayList<String>();
     String cit;
     System.out.println("Total number of bookings between " + startDate + " and " + endDate + " in: ");
     while (rs.next()) {
       cit = rs.getString("city");
       if(cities.contains(cit)){
-        System.out.print("Postal code: " + rs.getString("postal_code") + " is: " + rs.getInt("count(*)"));
+        System.out.println("Postal code: " + rs.getString("postal_code") + " is: " + rs.getInt("count(*)"));
       }
       else{
         System.out.println("--------------------------------------------------------------");
         System.out.println("City: "+ cit);
         cities.add(cit);
-        System.out.print("Postal code: " + rs.getString("postal_code") + " is: " + rs.getInt("count(*)"));
+        System.out.println("Postal code: " + rs.getString("postal_code") + " is: " + rs.getInt("count(*)"));
       }
     }
   }
@@ -98,28 +98,31 @@ A report that presents for each listing the set of most popular noun phrases ass
     int choice = scan.nextInt();
     if (choice == 1) {
       String sqlQ = "select count(*) as per_country, l.country from listings l group by l.country\n";
-      rs = sql.executeQuery(sqlQ);
+      st = connection.createStatement();
+      rs = st.executeQuery(sqlQ);
       System.out.println("Total number of listings per country is: ") ;
       while (rs.next()) {
         country = rs.getString("country");
-        System.out.print(country + ": " + rs.getInt("count(*)"));
+        System.out.println(country + ": " + rs.getInt("per_country"));
       }
     } else if (choice == 2) {
       String sqlQ = "select count(*) as per_country_and_city, l.country, l.city from listings l group by l.country, l.city order by l.city\n";
-      rs = sql.executeQuery(sqlQ);
+      st = connection.createStatement();
+      rs = st.executeQuery(sqlQ);
       while (rs.next()) {
         country = rs.getString("country");
         city = rs.getString("city");
-        System.out.print("Total number of listings for country " + country + " and city " + city + " is: " + rs.getInt("count(*)"));
+        System.out.println("Total number of listings for country " + country + " and city " + city + " is: " + rs.getInt("per_country_and_city"));
       }
     } else {
       String sqlQ = "select count(*) as per_country_city_and_postal_code, l.country, l.city, l.postal_code from listings l group by l.country, l.city, l.postal_code\n";
-      rs = sql.executeQuery(sqlQ);
+      st = connection.createStatement();
+      rs = st.executeQuery(sqlQ);
       while (rs.next()) {
         country = rs.getString("country");
         city = rs.getString("city");
         zipcode = rs.getString("postal_code");
-        System.out.print("Total number of listings for country " + country + " and city " + city + " with postal code " + zipcode + " is: " + rs.getInt("count(*)"));
+        System.out.println("Total number of listings for country " + country + " and city " + city + " with postal code " + zipcode + " is: " + rs.getInt("per_country_city_and_postal_code"));
       }
     }
   }
@@ -131,14 +134,15 @@ A report that presents for each listing the set of most popular noun phrases ass
     if (choice == 1) {
       String sqlQ = "select count(*), o.sin as Host_ID, l.city from listings l join owns o on l.listing_id = o.listing_id group by l.city, o.sin order by l.city, count(*)\n" +
               "desc\n";
-      rs = sql.executeQuery(sqlQ);
+      st = connection.createStatement();
+      rs = st.executeQuery(sqlQ);
       int i = 1;
       ArrayList<String> cities = new ArrayList<String>();
       String cit;
       while (rs.next()) {
         cit = rs.getString("city");
         if (cities.contains(cit)) {
-          System.out.println(i + ". Host ID: " + rs.getString("host_id") + " with" + rs.getString("count(*)") + "listings.");
+          System.out.println(i + ". Host ID: " + rs.getString("host_id") + " with " + rs.getString("count(*)") + " listings.");
           i++;
         } else {
           System.out.println("-------------------------------------------------------------------------------");
@@ -149,23 +153,24 @@ A report that presents for each listing the set of most popular noun phrases ass
         }
       }
     } else {
-      String sqlQ = "select count(*), o.sin as Host_ID, l.county from listings l join owns o on l.listing_id = o.listing_id group by l.country, o.sin order by l.country, count(*)\n" +
+      String sqlQ = "select count(*), o.sin as Host_ID, l.country from listings l join owns o on l.listing_id = o.listing_id group by l.country, o.sin order by l.country, count(*)\n" +
               "desc\n";
-      rs = sql.executeQuery(sqlQ);
+      st = connection.createStatement();
+      rs = st.executeQuery(sqlQ);
       int i = 1;
       ArrayList<String> countries = new ArrayList<String>();
       String con;
       while (rs.next()) {
         con = rs.getString("country");
         if (countries.contains(con)) {
-          System.out.println(i + ". Host ID: " + rs.getString("host_id") + " with" + rs.getString("count(*)") + "listings.");
+          System.out.println(i + ". Host ID: " + rs.getString("host_id") + " with " + rs.getString("count(*)") + " listings.");
           i++;
         } else {
           System.out.println("-------------------------------------------------------------------------------");
           System.out.println("Country: " + con);
           countries.add(con);
           i = 1;
-          System.out.println(i + ". Host ID: " + rs.getString("host_id") + " with" + rs.getString("count(*)") + "listings.");
+          System.out.println(i + ". Host ID: " + rs.getString("host_id") + " with " + rs.getString("count(*)") + " listings.");
         }
       }
     }
@@ -176,16 +181,17 @@ A report that presents for each listing the set of most popular noun phrases ass
   public static void tenPercent() throws SQLException {
     System.out.println("Hosts that have a number of listings that is more than 10% of the number of listings in that city and country are: ");
     String sqlQ = "drop table if exists temp, temp2\n";
-    sql.executeUpdate(sqlQ);
+    st = connection.createStatement();
+    st.executeUpdate(sqlQ);
     sqlQ = "create table temp select count(*) as number, l.city, l.country from listings l join owns o on l.listing_id = o.listing_id group by l.city, l.country order by l.city, l.country, number desc\n";
-    sql.executeUpdate(sqlQ);
+    st.executeUpdate(sqlQ);
     sqlQ = "create table temp2  select count(*) as number, o.sin as Host_ID, l.city, l.country from listings l join owns o on l.listing_id = o.listing_id group by l.city, l.country, o.sin order by l.city, l.country, number desc\n";
-    sql.executeUpdate(sqlQ);
+    st.executeUpdate(sqlQ);
     sqlQ = "select temp.city, temp.country, temp2.Host_ID from temp join temp2 on temp.city = temp2.city and temp.country=temp2.country where temp2.number*10 >= temp.number\n";
-    rs = sql.executeQuery(sqlQ);
+    rs = st.executeQuery(sqlQ);
 
     while(rs.next()){
-      System.out.print("Country: "+ rs.getString("country")+", city: "+ rs.getString("city")+", Host Id: "+ rs.getInt("Host_ID"));
+      System.out.println("Country: "+ rs.getString("country")+", city: "+ rs.getString("city")+", Host Id: "+ rs.getInt("Host_ID"));
     }
   }
 
@@ -196,7 +202,8 @@ A report that presents for each listing the set of most popular noun phrases ass
     System.out.print("End Date (YYYY-MM-DD): ");
     endDate = scan.nextLine();
     String sqlQ = "select count(*) as number, renter_ID from bookings b where start >= '" + startDate + "' and end <= '"+ endDate +"' group by renter_ID order by number desc\n";
-    rs = sql.executeQuery(sqlQ);
+    st = connection.createStatement();
+    rs = st.executeQuery(sqlQ);
     int i = 1;
     System.out.println("Renters and number of bookings they made between "+ startDate+ " - " + endDate+ ": ");
     while(rs.next()){
@@ -212,7 +219,8 @@ A report that presents for each listing the set of most popular noun phrases ass
     System.out.print("End Date (YYYY-MM-DD): ");
     endDate = scan.nextLine();
     String sqlQ = "select count(*) as number, b.renter_ID, l.city from bookings b join listings l on b.listing_id=l.listing_id where b.start >= '" + startDate + "' and b.end <= '" + endDate + "' group by b.renter_ID,l.city having number >=2 order by number desc\n";
-    rs = sql.executeQuery(sqlQ);
+    st = connection.createStatement();
+    rs = st.executeQuery(sqlQ);
     int i = 1;
     System.out.println("Renters and number of bookings they made between "+ startDate+ " - " + endDate+ " for each city: ");
     while(rs.next()){
