@@ -31,6 +31,7 @@ public class Report {
   public static String endDate;
   private static int wifi, washer, ac, kitchen, dryer;
   private static String[] room_types = {"Apartment", "House", "Room"};
+  static Statement sql2;
   static Statement sql;
 
   /*

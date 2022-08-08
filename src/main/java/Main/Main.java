@@ -1,5 +1,6 @@
 package Main;
 
+import Reports.Report;
 import User.LoginPage;
 import User.NewRegistration;
 
@@ -42,7 +43,7 @@ public class Main {
     } catch (IOException ex) {System.out.println(ex);}
   }
 
-  public static void getInput() {
+  public static void getInput() throws SQLException, InterruptedException {
     int selectedOption = 0;
     clearScreen();
     welcomeScreenBanner();
@@ -51,7 +52,8 @@ public class Main {
     Boolean Renter = false;
     System.out.println("Are you a:");
     System.out.println("1. Renter");
-    System.out.println("2. Host:");
+    System.out.println("2. Host");
+    System.out.println("3. Generate Reports");
 
     try {
       System.out.print("\nInput: ");
@@ -78,6 +80,60 @@ public class Main {
     else if(selectedOption == 2) {
       Renter = false;
       clearScreen();
+    }else if(selectedOption == 3){
+      System.out.println("Choose an option for which you would like to generate reports: \n");
+
+      System.out.println("1. Total number of bookings in a specific date range by city.");
+      System.out.println("2. Total number of bookings in a specific date range by postal code within a city.");
+      System.out.println("3. Total number of listings per country, per country and city, per country, city and postal code.");
+      System.out.println("4. Rank the hosts by the total number of listings they have overall per country or per city.");
+      System.out.println("5. For every city and country a report should provide the hosts that have a number of listings " +
+              "that is more than 10% of the number of listings in that city and country.");
+      System.out.println("6. Rank the renters by the number of bookings in a specific time period.");
+      System.out.println("7. Rank the renters by the number of bookings in a specific time period per city.(renters " +
+              "that have made at least 2 booking in the year).");
+      System.out.println("8. Hosts and renters with the largest number of cancellations within a year.");
+      System.out.println("9. A report that presents for each listing the set of most popular noun phrases associated" +
+              " with the listing (noun phrases from review).");
+      System.out.println("10. Exit");
+      int choice = scan.nextInt();
+      if(choice == 1){
+        Report.dateRangeAndCity();
+      }else if(choice == 2){
+        Report.dateRangeAndCityAndPostalCode();
+      }else if(choice ==3 ){
+        Report.listingsPerCountryCityPostalCode();
+      }else if(choice ==4 ){
+        Report.rankHosts();
+      }else if(choice == 5){
+        Report.tenPercent();
+      }else if(choice == 6){
+        Report.rankRentersDates();
+      }else if(choice == 7){
+        Report.rankRentersDatesCity();
+      }else if(choice ==8 ){
+
+      }else if(choice ==9 ){
+
+      }else if(choice == 10){
+        System.out.println("Redirecting to LogIn page menu....");
+        try{Thread.sleep(1000);
+        } catch (InterruptedException e) { e.printStackTrace();}
+
+        clearScreen();
+        welcomeScreenBanner();
+        getInput();
+      }else{
+        System.out.print("Invalid option! Try again.");
+        System.out.println("Redirecting to LogIn page menu....");
+        try{Thread.sleep(1000);
+        } catch (InterruptedException e) { e.printStackTrace();}
+
+        clearScreen();
+        welcomeScreenBanner();
+        getInput();
+      }
+
     } else {
       System.out.println("Invalid input... Try again!!!");
       System.out.println("Redirecting to LogIn page menu....");
