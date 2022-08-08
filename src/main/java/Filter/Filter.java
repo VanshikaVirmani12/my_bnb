@@ -230,7 +230,7 @@ public class Filter {
       String room, postal, city, country, apt;
       int listing_ID;
 
-      while(rs.next()) {
+      while (rs.next()) {
         listing_ID = rs.getInt("listing_ID");
         room = rs.getString("room_type");
         apt = rs.getString("apt_name");
@@ -342,9 +342,7 @@ public class Filter {
           displayAmenities();
           System.out.println("-----------------------------------------------\n");
 
-        }
-
-        else {
+        } else {
           sqlQ = "SELECT * \n" +
                   "FROM Listings l JOIN Calender c on l.listing_ID = c.listing_ID\n" +
                   "WHERE l.listing_ID = " + Listing_ID + "" +
@@ -597,7 +595,7 @@ public class Filter {
 
     q = "INSERT INTO Cancellations(booking_id, listing_ID, renter_ID, date, price) select b.booking_id, " +
             "b.listing_id, b.renter_id, c.date, c.price from bookings b join calender c on b.listing_id = c.listing_id " +
-            "where c.date >= b.start and c.date <= b.end and b.listing_id =" +id + "\n";
+            "where c.date >= b.start and c.date <= b.end and b.listing_id =" + id + "\n";
     System.out.println(q);
     sql.executeUpdate(q);
 
@@ -605,12 +603,12 @@ public class Filter {
             "start = '" + start_date + "' and end = '" + end_date + "'\n";
     System.out.println(q);
     rs = sql.executeQuery(sqlQ);
-    while(rs.next()) {
+    while (rs.next()) {
       Booking_ID = rs.getInt("booking_id");
     }
 
     q = "INSERT INTO Rents(listing_ID, SIN) VALUES (" +
-          //  Booking_ID + ", " + id + ", " + renter_id + ")\n";
+            //  Booking_ID + ", " + id + ", " + renter_id + ")\n";
             id + ", " + renter_id + ")\n";
     System.out.println(q);
     sql.executeUpdate(q);
@@ -1028,7 +1026,7 @@ public class Filter {
   }
 
 
-    public static void cancelBooking() throws SQLException, InterruptedException {
+  public static void cancelBooking() throws SQLException, InterruptedException {
     viewBookings();
     System.out.print("Enter the Booking Id of the booking that you would like to cancel\n");
     Booking_ID = scan.nextInt();
@@ -1040,16 +1038,16 @@ public class Filter {
 
     // for each listing_id you rent, what are the bookings associated with it that have already been completed?
     //delete b from bookings b join owns o on b.listing_ID=o.listing_ID where b.listing_ID=1;
-      sqlQ = "UPDATE Cancellations SET cancelled = 1 WHERE booking_id=" + Booking_ID + "\n";
-      System.out.println(sqlQ);
-      st.executeUpdate(sqlQ);
+    sqlQ = "UPDATE Cancellations SET cancelled = 1 WHERE booking_id=" + Booking_ID + "\n";
+    System.out.println(sqlQ);
+    st.executeUpdate(sqlQ);
 
-      sqlQ = "INSERT INTO Calender(date, price, listing_ID) SELECT date, price, listing_id FROM Cancellations WHERE booking_ID = " +
+    sqlQ = "INSERT INTO Calender(date, price, listing_ID) SELECT date, price, listing_id FROM Cancellations WHERE booking_ID = " +
             "" + Booking_ID + " AND cancelled=1\n";
     System.out.println(sqlQ);
-      st.executeUpdate(sqlQ);
+    st.executeUpdate(sqlQ);
 
-      //ResultSet rs = st.executeQuery(sqlQ);
+    //ResultSet rs = st.executeQuery(sqlQ);
 
 //    Date start = null, end = null, date = null;
 //    int id = 0, price = 50;
@@ -1077,24 +1075,24 @@ public class Filter {
 
   }
 
-    public static void displayAmenities() throws SQLException, InterruptedException {
-      List<String> amenities = new ArrayList<>();
-      st = connection.createStatement();
-      String sqlQ;
-      sqlQ = "SELECT * \n" +
-              "FROM Listings l JOIN Amenities a ON l.listing_ID=a.listing_ID\n" +
-              "WHERE l.listing_ID=" + Listing_ID + "\n";
-      System.out.println(sqlQ);
-      ResultSet rs = st.executeQuery(sqlQ);
-      String amenity;
-      while (rs.next()) {
-        amenity = rs.getString("amenity_type");
-        amenities.add(amenity);
-      }
-
-      System.out.println("Amenities = " + amenities);
-
+  public static void displayAmenities() throws SQLException, InterruptedException {
+    List<String> amenities = new ArrayList<>();
+    st = connection.createStatement();
+    String sqlQ;
+    sqlQ = "SELECT * \n" +
+            "FROM Listings l JOIN Amenities a ON l.listing_ID=a.listing_ID\n" +
+            "WHERE l.listing_ID=" + Listing_ID + "\n";
+    System.out.println(sqlQ);
+    ResultSet rs = st.executeQuery(sqlQ);
+    String amenity;
+    while (rs.next()) {
+      amenity = rs.getString("amenity_type");
+      amenities.add(amenity);
     }
+
+    System.out.println("Amenities = " + amenities);
+
+  }
 
 
   public static void deleteRenter() throws SQLException, InterruptedException {
@@ -1109,25 +1107,25 @@ public class Filter {
 
     Date start = null, end = null;
     int id = 0;
-    while (rs.next()) {
-      start = rs.getDate("start");
-      end = rs.getDate("end");
-      id = rs.getInt("listing_ID");
-
-      DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-      start_date = dateFormat.format(start);
-      end_date = dateFormat.format(end);
-      Listing.startDate = start_date;
-      Listing.endDate = end_date;
-      Listing.Listing_ID = id;
-      Listing.price = 50;
-      Listing.addAvailability();
-
-    }
+//    while (rs.next()) {
+//      start = rs.getDate("start");
+//      end = rs.getDate("end");
+//      id = rs.getInt("listing_ID");
+//
+//      DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//
+//      start_date = dateFormat.format(start);
+//      end_date = dateFormat.format(end);
+//      Listing.startDate = start_date;
+//      Listing.endDate = end_date;
+//      Listing.Listing_ID = id;
+//      Listing.price = 50;
+//      Listing.addAvailability();
+//
+//    }
 
     sqlQ = "DELETE r\n" +
-            "FROM Review r WHERE r.renter_ID =" + renter_ID + "\n" ;
+            "FROM Review r WHERE r.renter_ID =" + renter_ID + "\n";
     System.out.println(sqlQ);
     st.executeUpdate(sqlQ);
 
@@ -1137,20 +1135,21 @@ public class Filter {
     st.executeUpdate(sqlQ);
     System.out.println("This booking has been cancelled\n");
 
-    sqlQ = "d" + renter_ID + "\n";
+    sqlQ = "DELETE r\n" +
+            "FROM rents r WHERE r.SIN =" + renter_ID + "\n";
     System.out.println(sqlQ);
     st.executeUpdate(sqlQ);
 
 
     sqlQ = "DELETE r\n" +
-            "FROM renter r WHERE r.SIN =" + renter_ID + "\n" ;
+            "FROM renter r WHERE r.SIN =" + renter_ID + "\n";
     System.out.println(sqlQ);
     st.executeUpdate(sqlQ);
 
     sqlQ = "DELETE u\n" +
-            "FROM User u WHERE u.SIN =" + renter_ID + "\n" ;
+            "FROM User u WHERE u.SIN =" + renter_ID + "\n";
     System.out.println(sqlQ);
     st.executeUpdate(sqlQ);
-
-    }
   }
+
+}
