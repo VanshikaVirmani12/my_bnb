@@ -41,6 +41,8 @@ public class Listing {
   private static int wifi, washer, ac, kitchen, dryer;
   private static HashMap<Integer, String> mapListingInfo = new HashMap<>();
   private static String[] room_types = {"Apartment", "House", "Room"};
+  static Set<Integer> LISTING_SET = new HashSet<Integer>();
+
 
   public static void newListingScreenBanner() {
     System.out.println("\t\t\t\t\t\t  New Listing Page\n");
@@ -528,8 +530,7 @@ public class Listing {
     String sqlQ;
     sqlQ = "SELECT * \n" +
             "FROM Listings\n" +
-            "JOIN owns ON Listings.listing_ID=owns.listing_ID" +
-            " JOIN Bookings b ON Listings.listing_ID=b.listing_ID \n" +
+            "JOIN owns ON Listings.listing_ID=owns.listing_ID \n" +
             "WHERE owns.SIN = " + SIN + "\n";
     System.out.println(sqlQ);
     ResultSet rs = st.executeQuery(sqlQ);
@@ -545,26 +546,24 @@ public class Listing {
       city = rs.getString("city");
       country = rs.getString("country");
       postal = rs.getString("postal_code");
-      start = rs.getDate("start");
-      end = rs.getDate("end");
-      renter_ID = rs.getInt("renter_ID");
 
-      if (listing_ID != old_ID) {
+//      if (listing_ID != old_ID) {
         System.out.println("Listing ID = " + listing_ID);
         System.out.println("Room type = " + room);
         System.out.println("Apartment name/Road = " + apt);
         System.out.println("City = " + city);
         System.out.println("Country = " + country);
         System.out.println("Postal code = " + postal);
-      }
-      old_ID = listing_ID;
-
-      System.out.println("Booked from " + start + " to " + end + " for renter with ID " + renter_ID + "\n");
+//      }
+//      old_ID = listing_ID;
+//
+//      System.out.println("Booked from " + start + " to " + end + " for renter with ID " + renter_ID + "\n");
 
       System.out.println("-----------------------------------------------\n");
 
     }
 
+    viewBookings();
     Host.startPage();
 
   }

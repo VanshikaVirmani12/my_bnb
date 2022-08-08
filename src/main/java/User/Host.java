@@ -58,6 +58,7 @@ public class Host {
       }
     }else if(selectedOption == 2) {
       Listing.viewYourListings();
+      Listing.viewBookings();
     }else if(selectedOption == 3){
       System.out.println("Updating Listing");
       Listing.updateListing();
