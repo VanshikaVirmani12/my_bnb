@@ -697,7 +697,7 @@ public class Listing {
     String sqlQ2 = "select * from listings as l Join Amenities as c where l.listing_ID = c.listing_ID AND l.city = " + "'" + city+"'"+"\n";
     System.out.println("Executing give suggestions, amenities");
     st = connection.createStatement();
-    rs = st.executeQuery(sqlQ);
+    rs = st.executeQuery(sqlQ2);
 
     ArrayList<String> has_amenities = new ArrayList<String>(5);
     String amen_type;
