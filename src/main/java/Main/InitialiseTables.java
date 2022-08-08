@@ -328,10 +328,10 @@ public class InitialiseTables {
               "\thost_to_renter integer,\n" +
               "\trenter_to_host integer,\n" +
               "\trenter_to_listing integer,\n" +
-              "\tprimary key(review_ID), index(booking_ID), index(host_ID),  index(renter_ID),\n" +
-              "\tFOREIGN KEY (host_ID) REFERENCES Host(SIN),\n" +
-              "\tFOREIGN KEY (renter_ID) REFERENCES Renter(SIN),\n" +
-              "\tFOREIGN KEY (booking_ID) REFERENCES Bookings(booking_ID))\n";
+              "\tprimary key(review_ID), index(booking_ID), index(host_ID),  index(renter_ID))\n";
+              //"\tFOREIGN KEY (host_ID) REFERENCES Host(SIN),\n" +
+              //"\tFOREIGN KEY (renter_ID) REFERENCES Renter(SIN))\n";
+              //"\tFOREIGN KEY (booking_ID) REFERENCES Bookings(booking_ID))\n";
 
       sql.executeUpdate(sqlQ);
 
@@ -363,7 +363,6 @@ public class InitialiseTables {
 //      }
 //      ps.close();
 
-
       sqlQ = "create table Cancellations(\n" +
               "\tbooking_ID integer,\n" +
               "\tlisting_ID integer,\n" +
@@ -371,11 +370,8 @@ public class InitialiseTables {
               "\tdate Date,\n"+
               "\tprice integer,\n"+
               "\trenter_or_host integer,\n" +
-              "\tprimary key(booking_ID, listing_ID, renter_ID, renter_or_host), index(booking_ID), index(listing_ID),  index(renter_ID),\n" +
-              "\tFOREIGN KEY (listing_ID) REFERENCES Listings(listing_ID),\n" +
-              "\tFOREIGN KEY (renter_ID) REFERENCES Renter(SIN),\n" +
-              "\tFOREIGN KEY (booking_ID) REFERENCES Bookings(booking_ID))\n";
-
+              "\tcancelled integer,\n" +
+              "\tprimary key(booking_ID, date, renter_or_host), index(booking_ID), index(date),  index(renter_ID))\n" ;
       sql.executeUpdate(sqlQ);
 
 

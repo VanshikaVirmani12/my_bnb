@@ -21,7 +21,7 @@ import User.LoginPage;
 
 public class Listing {
   public static int Listing_ID = 0;
-  private static int Booking_ID;
+  public static int Booking_ID;
   private static int Host_ID, Renter_ID;
   private static Connection connection = ConnectionEstablish.ConnectToJDBC.getMySqlConnection();
   private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -366,11 +366,12 @@ public class Listing {
 
     System.out.println(sqlQ);
     st.executeUpdate(sqlQ);
+
     Host.startPage();
 
   }
 
-  public static void addAvailability() throws SQLException, InterruptedException {
+    public static void addAvailability() throws SQLException, InterruptedException {
 
     LocalDate start = LocalDate.parse(startDate, formatter);
     LocalDate ending = LocalDate.parse(endDate, formatter);
@@ -494,29 +495,52 @@ public class Listing {
     int SIN = User.LoginPage.getSIN();
     String sqlQ;
 
-    // for each listing_id you own, what are the bookings associated with it that have already been completed?
-    //delete b from bookings b join owns o on b.listing_ID=o.listing_ID where b.listing_ID=1;
-    sqlQ = "SELECT * FROM Bookings b JOIN owns o ON b.listing_ID=o.listing_ID WHERE b.booking_ID = " + Booking_ID + "\n";
+    sqlQ = "UPDATE Cancellations SET cancelled = 1 WHERE booking_id=" + Booking_ID + "\n";
+    System.out.println(sqlQ);
+    st.executeUpdate(sqlQ);
+
+    sqlQ = "UPDATE Cancellations SET renter_or_host = 1 WHERE booking_id=" + Booking_ID + "\n";
+    System.out.println(sqlQ);
+    st.executeUpdate(sqlQ);
+
+//    // for each listing_id you own, what are the bookings associated with it that have already been completed?
+//    //delete b from bookings b join owns o on b.listing_ID=o.listing_ID where b.listing_ID=1;
+//    sqlQ = "SELECT * FROM Bookings b JOIN owns o ON b.listing_ID=o.listing_ID WHERE b.booking_ID = " + Booking_ID + "\n";
+//    System.out.println(sqlQ);
+//    ResultSet rs = st.executeQuery(sqlQ);
+//
+//    Date start = null, end = null;
+//
+//    while(rs.next()) {
+//      start = rs.getDate("start");
+//      end = rs.getDate("end");
+//    }
+
+    sqlQ = "SELECT * FROM Cancellations WHERE booking_ID = " +
+            "" + Booking_ID + " AND cancelled=1\n";
     System.out.println(sqlQ);
     ResultSet rs = st.executeQuery(sqlQ);
 
-    Date start = null, end = null;
-
-    while(rs.next()) {
-      start = rs.getDate("start");
-      end = rs.getDate("end");
+    Date start = null, end = null, date = null;
+    int id = 0, price = 50;
+    while (rs.next()) {
+      date = rs.getDate("date");
+      id = rs.getInt("listing_ID");
+      price = rs.getInt("price");
+      sqlQ = "INSERT INTO Calender(date, price, listing_ID) values ('" + date + "', " +
+              id + ", " + price + ")\n";
+      System.out.println(sqlQ);
+      st.executeUpdate(sqlQ);
     }
 
-    sqlQ = "DELETE b FROM Bookings b JOIN owns o ON b.listing_ID=o.listing_ID WHERE b.listing_ID = " + Listing_ID + "\n";
+
+
+    sqlQ = "DELETE b FROM Bookings b JOIN owns o ON b.listing_ID=o.listing_ID WHERE b.booking_id = " + Booking_ID + "\n";
     System.out.println(sqlQ);
     st.executeUpdate(sqlQ);
 
     System.out.println("This booking has been cancelled\n");
     DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
-
-    startDate = dateFormat.format(start);
-    endDate = dateFormat.format(end);
-    addAvailability();
 
     Host.startPage();
   }
@@ -567,7 +591,6 @@ public class Listing {
     Host.startPage();
 
   }
-
 
     public static void removeListing() throws SQLException, InterruptedException {
     System.out.print("Specify the Listing ID of the listing that you want to delete. CAUTION: This listing" +
