@@ -449,6 +449,7 @@ public class InitialiseTables {
 
               "\n";
 
+
       sql.executeUpdate(sqlQ);
 
       sqlQ = "create table rents(\n" +
