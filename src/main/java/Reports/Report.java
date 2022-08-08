@@ -200,6 +200,7 @@ A report that presents for each listing the set of most popular noun phrases ass
     System.out.println("Renters and number of bookings they made between "+ startDate+ " - " + endDate+ ": ");
     while(rs.next()){
       System.out.println(i+". Renter ID: "+ rs.getInt("renter_ID")+ ", # Bookings: "+ rs.getInt("number"));
+      i++;
     }
   }
 
@@ -215,6 +216,7 @@ A report that presents for each listing the set of most popular noun phrases ass
     System.out.println("Renters and number of bookings they made between "+ startDate+ " - " + endDate+ " for each city: ");
     while(rs.next()){
       System.out.println(i+". Renter ID: "+ rs.getInt("renter_ID")+ ", # Bookings: "+ rs.getInt("number")+ ", City: "+ rs.getString("city"));
+      i++;
     }
   }
 }
