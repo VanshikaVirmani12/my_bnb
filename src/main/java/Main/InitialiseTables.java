@@ -19,7 +19,7 @@ public class InitialiseTables {
       String sqlQ;
       sqlQ = "SET FOREIGN_KEY_CHECKS = 0\n";
       sql.executeUpdate(sqlQ);
-      sqlQ = "DROP TABLE IF EXISTS Listings, Student, Course, Offering,Took, Calender, has_availability, Address, has_address, Amenities, has_amenities, User, owns, rents, Review, Renter, Host, Bookings\n";
+      sqlQ = "DROP TABLE IF EXISTS Listings, Student, Course, Offering,Took, Calender, has_availability, Address, has_address, Amenities, has_amenities, User, owns, rents, Review, Renter, Host, Bookings, Cancellations\n";
       sql.executeUpdate(sqlQ);
       PreparedStatement ps;
 
@@ -363,6 +363,20 @@ public class InitialiseTables {
 //      }
 //      ps.close();
 
+
+      sqlQ = "create table Cancellations(\n" +
+              "\tbooking_ID integer,\n" +
+              "\tlisting_ID integer,\n" +
+              "\trenter_ID integer,\n" +
+              "\tdate Date,\n"+
+              "\tprice integer,\n"+
+              "\trenter_or_host integer,\n" +
+              "\tprimary key(booking_ID, listing_ID, renter_ID, renter_or_host), index(booking_ID), index(listing_ID),  index(renter_ID),\n" +
+              "\tFOREIGN KEY (listing_ID) REFERENCES Listings(listing_ID),\n" +
+              "\tFOREIGN KEY (renter_ID) REFERENCES Renter(SIN),\n" +
+              "\tFOREIGN KEY (booking_ID) REFERENCES Bookings(booking_ID))\n";
+
+      sql.executeUpdate(sqlQ);
 
 
     } catch (SQLException | ParseException e) {
