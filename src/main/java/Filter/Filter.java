@@ -219,6 +219,37 @@ public class Filter {
     if (empty == 0) {
       System.out.println("No filter applied! here are the first 20 results from listing: ");
       // Display the first 20 listings and return to the filters page
+
+      st = connection.createStatement();
+      String sqlQ;
+
+      sqlQ = "SELECT * FROM Listings Limit 20 \n";
+      System.out.println(sqlQ);
+      ResultSet rs = st.executeQuery(sqlQ);
+
+      String room, postal, city, country, apt;
+      int listing_ID;
+
+      while(rs.next()) {
+        listing_ID = rs.getInt("listing_ID");
+        room = rs.getString("room_type");
+        apt = rs.getString("apt_name");
+        city = rs.getString("city");
+        country = rs.getString("country");
+        postal = rs.getString("postal_code");
+
+        System.out.println("Listing ID = " + listing_ID);
+        System.out.println("Room type = " + room);
+        System.out.println("Apartment name/Road = " + apt);
+        System.out.println("City = " + city);
+        System.out.println("Country = " + country);
+        System.out.println("Postal code = " + postal);
+
+        displayAmenities();
+        System.out.println("-----------------------------------------------\n");
+      }
+
+
       return;
     }
 
@@ -338,6 +369,7 @@ public class Filter {
           city = rs.getString("city");
           country = rs.getString("country");
           postal = rs.getString("postal_code");
+          Listing_ID = listing_ID;
 
           System.out.println("Listing ID = " + listing_ID);
           System.out.println("Room type = " + room);
@@ -559,33 +591,26 @@ public class Filter {
     System.out.println(q);
     sql.executeUpdate(q);
 
-//    q = "Select booking_ID from Bookings where listing_id =" + id + " and" +
-//            "start = '" + start_date + "' and end = '" + end_date + "')\n";
-//    System.out.println(q);
-//    rs = sql.executeQuery(sqlQ);
-//    while(rs.next()) {
-//      Booking_ID = rs.getInt("booking_id");
-//    }
 
     Date date;
     int price;
 
-    q = " select * from bookings b join calender c on b.listing_id = c.listing_id where " +
-            "c.date >= b.start and c.date <= b.end and b.listing_id =" +id;
+    q = "INSERT INTO Cancellations(booking_id, listing_ID, renter_ID, date, price) select b.booking_id, " +
+            "b.listing_id, b.renter_id, c.date, c.price from bookings b join calender c on b.listing_id = c.listing_id " +
+            "where c.date >= b.start and c.date <= b.end and b.listing_id =" +id + "\n";
+    System.out.println(q);
+    sql.executeUpdate(q);
+
+    q = "Select booking_ID from Bookings where listing_id =" + id + " and" +
+            "start = '" + start_date + "' and end = '" + end_date + "'\n";
     System.out.println(q);
     rs = sql.executeQuery(sqlQ);
     while(rs.next()) {
       Booking_ID = rs.getInt("booking_id");
-      Listing_ID = id;
-      date = rs.getDate("date");
-      price = rs.getInt("price");
-      q = "INSERT INTO Cancellations(booking_id, listing_ID, renter_ID, date, price, renter_or_host, cancelled) VALUES (" +
-              Booking_ID + ", " + Listing_ID + ", " + renter_id + ", '" + date + "', " + price + ", 0, 0)\n";
-      System.out.println(q);
-      sql.executeUpdate(q);
     }
 
     q = "INSERT INTO Rents(listing_ID, SIN) VALUES (" +
+          //  Booking_ID + ", " + id + ", " + renter_id + ")\n";
             id + ", " + renter_id + ")\n";
     System.out.println(q);
     sql.executeUpdate(q);
@@ -1002,13 +1027,6 @@ public class Filter {
     }
   }
 
-  public static void insertCancellation() throws SQLException, InterruptedException {
-    st = connection.createStatement();
-
-
-
-  }
-
 
     public static void cancelBooking() throws SQLException, InterruptedException {
     viewBookings();
@@ -1026,22 +1044,24 @@ public class Filter {
       System.out.println(sqlQ);
       st.executeUpdate(sqlQ);
 
-      sqlQ = "SELECT * FROM Cancellations WHERE b.booking_ID = " +
+      sqlQ = "INSERT INTO Calender(date, price, listing_ID) SELECT date, price, listing_id FROM Cancellations WHERE booking_ID = " +
             "" + Booking_ID + " AND cancelled=1\n";
     System.out.println(sqlQ);
-    ResultSet rs = st.executeQuery(sqlQ);
-
-    Date start = null, end = null, date = null;
-    int id = 0, price = 50;
-    while (rs.next()) {
-      date = rs.getDate("date");
-      id = rs.getInt("listing_ID");
-      price = rs.getInt("price");
-      sqlQ = "INSERT INTO Calender(date, price, listing_ID) values ('" + date + "', " +
-              id + ", " + price + ")\n";
-      System.out.println(sqlQ);
       st.executeUpdate(sqlQ);
-    }
+
+      //ResultSet rs = st.executeQuery(sqlQ);
+
+//    Date start = null, end = null, date = null;
+//    int id = 0, price = 50;
+//    while (rs.next()) {
+//      date = rs.getDate("date");
+//      id = rs.getInt("listing_ID");
+//      price = rs.getInt("price");
+//      sqlQ = "INSERT INTO Calender(date, price, listing_ID) values ('" + date + "', " +
+//              id + ", " + price + ")\n";
+//      System.out.println(sqlQ);
+//      st.executeUpdate(sqlQ);
+//    }
 
     sqlQ = "DELETE b FROM Bookings b JOIN rents r ON b.booking_ID = r.booking_ID WHERE b.booking_ID = " +
             "" + Booking_ID + " AND r.SIN=" + SIN + " AND b.completed=0\n";
