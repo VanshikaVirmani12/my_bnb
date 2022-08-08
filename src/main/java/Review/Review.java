@@ -207,7 +207,7 @@ public class Review {
 
     sqlQ = "INSERT INTO Review (booking_ID, host_ID, renter_ID, comment, rating, host_to_renter, " +
             "renter_to_host, renter_to_listing) VALUES (" +
-            Booking_ID + ", " + host_ID + ", " + renter_ID + ", '" + comment + "', " + rating + ", 0, 0, 1)\n";
+            Booking_ID + ", " + host_ID + ", " + renter_ID + ", '" + comment + "', '" + rating + "', 0, 0, 1)\n";
 
     System.out.println(sqlQ);
     st.executeUpdate(sqlQ);
