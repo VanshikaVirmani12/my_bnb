@@ -52,6 +52,25 @@ public class NewRegistration {
     mapUserInfo.put(6, occupation);
     System.out.print("Date of Birth (YYYY-MM-DD): ");
     dob = scan.nextLine();
+    String[] arr = dob.split("-", 3);
+    int year = Integer.parseInt(arr[0]);
+    int day = Integer.parseInt(arr[2]);
+    int month = Integer.parseInt(arr[1]);
+    //System.out.println(year);
+    if( year > 2004){
+      System.out.print("You need to be at least 18 to sign-up!");
+      System.exit(0);
+    }else if( year == 2004){
+      if (month > 8){
+        System.out.print("You need to be at least 18 to sign-up!");
+        System.exit(0);
+      }else if( month == 8){
+        if(day > 8){
+          System.out.print("You need to be at least 18 to sign-up!");
+          System.exit(0);
+        }
+      }
+    }
     mapUserInfo.put(7, dob);
 
     System.out.print("Apartment Number/Street: ");
