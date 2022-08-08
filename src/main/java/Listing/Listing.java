@@ -17,10 +17,12 @@ import java.time.temporal.ChronoUnit;
 
 import Main.Main;
 import User.Host;
+import User.LoginPage;
 
 public class Listing {
   public static int Listing_ID = 0;
   private static int Booking_ID;
+  private static int Host_ID, Renter_ID;
   private static Connection connection = ConnectionEstablish.ConnectToJDBC.getMySqlConnection();
   private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -492,7 +494,7 @@ public class Listing {
 
     // for each listing_id you own, what are the bookings associated with it that have already been completed?
     //delete b from bookings b join owns o on b.listing_ID=o.listing_ID where b.listing_ID=1;
-    sqlQ = "SELECT b FROM Bookings b JOIN owns o ON b.listing_ID=o.listing_ID WHERE b.booking_ID = " + Booking_ID + "\n";
+    sqlQ = "SELECT * FROM Bookings b JOIN owns o ON b.listing_ID=o.listing_ID WHERE b.booking_ID = " + Booking_ID + "\n";
     System.out.println(sqlQ);
     ResultSet rs = st.executeQuery(sqlQ);
 
@@ -717,4 +719,78 @@ public class Listing {
     // ask if they want to change the price and amenities, and then if they want to take the new ifo and store that!
 
   }
-}
+
+  public static void deleteHost() throws SQLException, InterruptedException {
+    st = connection.createStatement();
+    Host_ID = LoginPage.getSIN();
+    String sqlQ;
+
+    sqlQ = "SELECT * FROM Bookings b JOIN owns o ON b.listing_ID=o.listing_ID WHERE " +
+            " o.SIN=" + Host_ID + " AND b.completed=0\n";
+    System.out.println(sqlQ);
+    ResultSet rs = st.executeQuery(sqlQ);
+
+    Date start = null, end = null;
+    int id = 0;
+    while (rs.next()) {
+      start = rs.getDate("start");
+      end = rs.getDate("end");
+      id = rs.getInt("listing_ID");
+
+      DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+      startDate = dateFormat.format(start);
+      endDate = dateFormat.format(end);
+      Listing_ID = id;
+      price = 50;
+      addAvailability();
+    }
+
+    sqlQ = "d" +
+            " o.SIN=" + Host_ID + " AND b.completed=0\n";
+    System.out.println(sqlQ);
+    st.executeUpdate(sqlQ);
+
+    sqlQ = "DELETE r\n" +
+            "FROM Review r WHERE r.host_ID =" + Host_ID + "\n" ;
+    System.out.println(sqlQ);
+    st.executeUpdate(sqlQ);
+
+    sqlQ = "DELETE b FROM Bookings b JOIN owns o ON b.listing_ID=o.listing_ID WHERE " +
+            " o.SIN=" + Host_ID + " AND b.completed=0\n";
+    System.out.println(sqlQ);
+    st.executeUpdate(sqlQ);
+
+    System.out.println("This booking has been cancelled\n");
+
+    sqlQ = "DELETE a FROM Amenities a JOIN owns o ON a.listing_ID=o.listing_ID WHERE" +
+            " o.SIN=" + Host_ID + "\n";
+    System.out.println(sqlQ);
+    st.executeUpdate(sqlQ);
+
+    sqlQ = "DELETE c FROM Calender c JOIN owns o ON c.listing_ID=o.listing_ID WHERE" +
+            " o.SIN=" + Host_ID + "\n";
+    System.out.println(sqlQ);
+    st.executeUpdate(sqlQ);
+
+    sqlQ = "DELETE l FROM Listings l JOIN owns o ON l.listing_ID=o.listing_ID WHERE" +
+            " o.SIN=" + Host_ID + "\n";
+    System.out.println(sqlQ);
+    st.executeUpdate(sqlQ);
+
+    sqlQ = "DELETE o FROM owns o WHERE o.SIN=" + Host_ID + "\n";
+    System.out.println(sqlQ);
+    st.executeUpdate(sqlQ);
+
+    sqlQ = "DELETE h FROM Host h WHERE h.SIN=" + Host_ID + "\n";
+    System.out.println(sqlQ);
+    st.executeUpdate(sqlQ);
+
+    sqlQ = "DELETE u\n" +
+            "FROM User u WHERE u.SIN =" + Host_ID + "\n" ;
+    System.out.println(sqlQ);
+    st.executeUpdate(sqlQ);
+
+  }
+
+  }
+

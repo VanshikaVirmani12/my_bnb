@@ -132,29 +132,29 @@ public class InitialiseTables {
 
 
       //has_addr(listing_id, postal_code, city, country, number_name)
-      sqlQ = "create table has_address(\n" +
-              "\tlisting_ID integer NOT NULL AUTO_INCREMENT,\n" +
-              "\tpostal_code varchar(8),\n" +
-              "\tcity varchar(15),\n" +
-              "\tcountry varchar(15),\n" +
-              "\tapt_name varchar(30),\n" +
-              "\tprimary key(listing_ID, postal_code, city, country, apt_name),\n" +
-              "\tFOREIGN KEY (listing_ID) REFERENCES Listings(listing_ID))\n";
-
-      sql.executeUpdate(sqlQ);
-
-      sqlQ = "INSERT INTO has_address VALUES (?,?,?,?,?\n)";
-      ps = connection.prepareStatement(sqlQ);
-
-      for (int i=0; i<4; i++){
-        ps.setInt(1, i);
-        ps.setString(2, postal_codes[i]);
-        ps.setString(3,city[i]);
-        ps.setString(4,country[i]);
-        ps.setString(5,apt[i]);
-        ps.executeUpdate();
-      }
-      ps.close();
+//      sqlQ = "create table has_address(\n" +
+//              "\tlisting_ID integer NOT NULL AUTO_INCREMENT,\n" +
+//              "\tpostal_code varchar(8),\n" +
+//              "\tcity varchar(15),\n" +
+//              "\tcountry varchar(15),\n" +
+//              "\tapt_name varchar(30),\n" +
+//              "\tprimary key(listing_ID, postal_code, city, country, apt_name),\n" +
+//              "\tFOREIGN KEY (listing_ID) REFERENCES Listings(listing_ID))\n";
+//
+//      sql.executeUpdate(sqlQ);
+//
+//      sqlQ = "INSERT INTO has_address VALUES (?,?,?,?,?\n)";
+//      ps = connection.prepareStatement(sqlQ);
+//
+//      for (int i=0; i<4; i++){
+//        ps.setInt(1, i);
+//        ps.setString(2, postal_codes[i]);
+//        ps.setString(3,city[i]);
+//        ps.setString(4,country[i]);
+//        ps.setString(5,apt[i]);
+//        ps.executeUpdate();
+//      }
+//      ps.close();
 
       sqlQ = "create table Amenities(\n" +
               "\tamenity_ID integer,\n" +
@@ -242,17 +242,10 @@ public class InitialiseTables {
 
       sql.executeUpdate(sqlQ);
 
-      String[] payment_info = {"1293-9287", "8273-8734"};
+     // String[] payment_info = {"1293-9287", "8273-8734"};
 
-      sqlQ = "INSERT INTO Renter VALUES (?,?\n) ";
-      ps = connection.prepareStatement(sqlQ);
-
-      for (int i=0; i<2; i++){
-        ps.setInt(1, (i*2));
-        ps.setString(2, payment_info[i]);
-        ps.executeUpdate();
-      }
-      ps.close();
+      sqlQ = "INSERT INTO Renter VALUES (2,'1293-9287'\n) ";
+      sql.executeUpdate(sqlQ);
 
       sqlQ = "create table Host(\n" +
               "\tSIN integer,\n" +
@@ -274,8 +267,8 @@ public class InitialiseTables {
               "\tSIN integer,\n" +
               "\tlisting_ID integer NOT NULL,\n" +
               "\tprimary key(listing_ID, SIN), index(listing_ID), index(SIN),\n" +
-              "\tFOREIGN KEY (SIN) REFERENCES User(SIN),\n" +
-              "\tFOREIGN KEY (listing_ID) REFERENCES Listings(listing_ID))\n";
+              "\tFOREIGN KEY (SIN) REFERENCES User(SIN))\n";
+            //  "\tFOREIGN KEY (listing_ID) REFERENCES Listings(listing_ID))\n";
 
       sql.executeUpdate(sqlQ);
 
@@ -317,8 +310,8 @@ public class InitialiseTables {
               "\tlisting_ID integer,\n" +
               "\tprimary key(booking_ID, listing_ID, SIN), index(booking_ID), index(listing_ID), index(SIN),\n" +
               "\tFOREIGN KEY (SIN) REFERENCES User(SIN),\n" +
-              "\tFOREIGN KEY (listing_ID) REFERENCES Listings(listing_ID),\n" +
-              "\tFOREIGN KEY (booking_ID) REFERENCES Bookings(booking_ID))\n";
+              "\tFOREIGN KEY (listing_ID) REFERENCES Listings(listing_ID))\n" ;
+           //   "\tFOREIGN KEY (booking_ID) REFERENCES Bookings(booking_ID))\n";
 
       sql.executeUpdate(sqlQ);
 

@@ -1052,32 +1052,34 @@ public class Filter {
       start = rs.getDate("start");
       end = rs.getDate("end");
       id = rs.getInt("listing_ID");
+
+      DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+      start_date = dateFormat.format(start);
+      end_date = dateFormat.format(end);
+      Listing.startDate = start_date;
+      Listing.endDate = end_date;
+      Listing.Listing_ID = id;
+      Listing.price = 50;
+      Listing.addAvailability();
+
     }
-
-    sqlQ = "DELETE b FROM Bookings b JOIN rents r ON b.booking_ID = r.booking_ID WHERE" +
-            " r.SIN=" + renter_ID + " AND b.completed=0\n";
-    System.out.println(sqlQ);
-    st.executeUpdate(sqlQ);
-
-    sqlQ = "DELETE r FROM rents r WHERE r.SIN=" + renter_ID + "\n";
-    System.out.println(sqlQ);
-    st.executeUpdate(sqlQ);
-
-    System.out.println("This booking has been cancelled\n");
-    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-    start_date = dateFormat.format(start);
-    end_date = dateFormat.format(end);
-    Listing.startDate = start_date;
-    Listing.endDate = end_date;
-    Listing.Listing_ID = id;
-    Listing.price = 50;
-    Listing.addAvailability();
 
     sqlQ = "DELETE r\n" +
             "FROM Review r WHERE r.renter_ID =" + renter_ID + "\n" ;
     System.out.println(sqlQ);
     st.executeUpdate(sqlQ);
+
+    sqlQ = "DELETE b FROM Bookings b JOIN rents r ON b.booking_ID = r.booking_ID WHERE" +
+            " r.SIN=" + renter_ID + " AND b.completed=0\n";
+    System.out.println(sqlQ);
+    st.executeUpdate(sqlQ);
+    System.out.println("This booking has been cancelled\n");
+
+    sqlQ = "d" + renter_ID + "\n";
+    System.out.println(sqlQ);
+    st.executeUpdate(sqlQ);
+
 
     sqlQ = "DELETE r\n" +
             "FROM renter r WHERE r.SIN =" + renter_ID + "\n" ;
@@ -1088,6 +1090,6 @@ public class Filter {
             "FROM User u WHERE u.SIN =" + renter_ID + "\n" ;
     System.out.println(sqlQ);
     st.executeUpdate(sqlQ);
-    
+
     }
   }

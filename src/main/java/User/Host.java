@@ -70,7 +70,10 @@ public class Host {
     }else if(selectedOption == 6){
       System.out.println("Review a Renter");
       Review.reviewRenter();
-    } else {
+    } else if(selectedOption == 7){
+      System.out.println("Delete your account");
+      Listing.deleteHost();
+    }else {
       System.out.println("Invalid input... Try again!!!");
       System.out.println("Redirecting to LogIn page menu....");
       try{Thread.sleep(1000);
