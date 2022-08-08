@@ -609,7 +609,7 @@ public class Listing {
 
   public static void give_suggestions() throws SQLException {
     System.out.print("Please enter the following information to know more about your listing: \n");
-    System.out.print("Specify the type of Listing. Enter 1 for Apartment, 2 for House, 3 for Rooms\n");
+    System.out.print("Specify the type of Listing. Enter 1 for Apartment, 2 for House, 3 for Rooms: ");
     type = scan.nextInt();
     scan.nextLine();
     room_type = room_types[type - 1];
@@ -710,11 +710,57 @@ public class Listing {
     if (has_amenities.isEmpty()){
       System.out.println("This is the first listing being added in the city, so no suggested amenities available!");
     }else{
-      System.out.println("These are the amenities in provided by the other hosts in you area: "+has_amenities);
-      System.out.println("You can add the other amenities to boost your listing!");
-      // can also display the amenitites they would want to add to increase boosting
+      System.out.println("These are the amenitie(s) in provided by the other hosts in you area: "+has_amenities);
+      ArrayList<String> add_amenities = new ArrayList<String>(5);
+      if (!has_amenities.contains("Kitchen")){
+        add_amenities.add("Kitchen");
+      }
+      if (!has_amenities.contains("AC")){
+        add_amenities.add("AC");
+      }
+      if (!has_amenities.contains("Dryer")){
+        add_amenities.add("Dryer");
+      }
+      if (!has_amenities.contains("Washer")){
+        add_amenities.add("Washer");
+      }
+      if (!has_amenities.contains("Wifi")){
+        add_amenities.add("Wifi");
+      }
+      if(add_amenities.size() > 0){
+        System.out.println("You can add the following amenitie(s) to boost your listing: "+add_amenities);
+      }
+      System.out.println("Would you like to update prices and/or amenities?");
+      System.out.print("Enter 1 to update and 2 to continue: ");
+      int choice = scan.nextInt();
+      if (choice == 1){
+        System.out.print("Price: ");
+        price = scan.nextInt();
+        scan.nextLine();
+        mapListingInfo.put(10, String.valueOf(price));
+
+        System.out.print("Enter 1 for the amenities that are included in this listing. Enter 0 otherwise\n");
+        System.out.print("Wifi: ");
+        wifi = scan.nextInt();
+        scan.nextLine();
+        System.out.print("Washer: ");
+        washer = scan.nextInt();
+        scan.nextLine();
+        System.out.print("AC: ");
+        ac = scan.nextInt();
+        scan.nextLine();
+        System.out.print("Kitchen: ");
+        kitchen = scan.nextInt();
+        scan.nextLine();
+        System.out.print("Dryer: ");
+        dryer = scan.nextInt();
+        scan.nextLine();
+      } else{
+        System.out.println("Adding the listing with previously specified prices and amenities!");
+      }
     }
 
+    redirectListingOptions();
 
     // ask if they want to change the price and amenities, and then if they want to take the new ifo and store that!
 
