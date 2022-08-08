@@ -187,4 +187,19 @@ A report that presents for each listing the set of most popular noun phrases ass
       System.out.print("Country: "+ rs.getString("country")+", city: "+ rs.getString("city")+", Host Id: "+ rs.getInt("Host_ID"));
     }
   }
+
+  public static void rankRentersDates() throws SQLException {
+    System.out.print("Specify the date range\n");
+    System.out.print("Start Date (YYYY-MM-DD): ");
+    startDate = scan.nextLine();
+    System.out.print("End Date (YYYY-MM-DD): ");
+    endDate = scan.nextLine();
+    String sqlQ = "select count(*) as number, renter_ID from bookings b where start >= '" + startDate + "' and end <= '"+ endDate +"' group by renter_ID order by number desc\n";
+    rs = sql.executeQuery(sqlQ);
+    int i = 1;
+    System.out.println("Renters and number of bookings they made between "+ startDate+ " - " + endDate+ ": ");
+    while(rs.next()){
+      System.out.println(i+". Renter ID: "+ rs.getInt("renter_ID")+ ", # Bookings: "+ rs.getInt("number"));
+    }
+  }
 }
