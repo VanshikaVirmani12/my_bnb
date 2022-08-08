@@ -127,7 +127,30 @@ A report that presents for each listing the set of most popular noun phrases ass
   }
 
 
-  public static void rankHosts(){
+  public static void rankHosts() throws SQLException {
+    System.out.print("Enter 1 to rank hosts by Country and 2 to rank hosts by city: ");
+    int choice = scan.nextInt();
+    if (choice == 1) {
+      System.out.print("Specify country: ");
+      country = scan.nextLine();
+      String sqlQ = "SELECT firstname, lastname, COUNT(o.SIN) AS value_occurrence FROM owns as o join listings as l on l.listing_id = o.listing_id JOIN user as u on u.SIN = o.SIN where country = '"+country+"' GROUP BY o.SIN ORDER BY value_occurrence DESC;\n";
+      rs = sql.executeQuery(sqlQ);
+      int i = 1;
+      while(rs.next()){
+        System.out.print(i+". "+ rs.getString("firstname") + " "+ rs.getString("lastname"));
+        i++;
+      }
+    }else {
+      System.out.print("Specify city: ");
+      city = scan.nextLine();
+      String sqlQ = "SELECT firstname, lastname, COUNT(o.SIN) AS value_occurrence FROM owns as o join listings as l on l.listing_id = o.listing_id JOIN user as u on u.SIN = o.SIN where city = '"+city+"' GROUP BY o.SIN ORDER BY value_occurrence DESC;\n";
+      rs = sql.executeQuery(sqlQ);
+      int i = 1;
+      while(rs.next()) {
+        System.out.print(i + ". " + rs.getString("firstname") + " " + rs.getString("lastname"));
+        i++;
+      }
+    }
 
   }
 
