@@ -170,4 +170,21 @@ A report that presents for each listing the set of most popular noun phrases ass
     }
 
   }
+
+
+  public static void tenPercent() throws SQLException {
+    System.out.println("Hosts that have a number of listings that is more than 10% of the number of listings in that city and country are: ");
+    String sqlQ = "drop table if exists temp, temp2\n";
+    sql.executeUpdate(sqlQ);
+    sqlQ = "create table temp select count(*) as number, l.city, l.country from listings l join owns o on l.listing_id = o.listing_id group by l.city, l.country order by l.city, l.country, number desc\n";
+    sql.executeUpdate(sqlQ);
+    sqlQ = "create table temp2  select count(*) as number, o.sin as Host_ID, l.city, l.country from listings l join owns o on l.listing_id = o.listing_id group by l.city, l.country, o.sin order by l.city, l.country, number desc\n";
+    sql.executeUpdate(sqlQ);
+    sqlQ = "select temp.city, temp.country, temp2.Host_ID from temp join temp2 on temp.city = temp2.city and temp.country=temp2.country where temp2.number*10 >= temp.number\n";
+    rs = sql.executeQuery(sqlQ);
+
+    while(rs.next()){
+      System.out.print("Country: "+ rs.getString("country")+", city: "+ rs.getString("city")+", Host Id: "+ rs.getInt("Host_ID"));
+    }
+  }
 }
